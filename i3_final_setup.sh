@@ -23,8 +23,8 @@ export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
 export PATH=$PATH:/usr/local/go/bin
 source "$HOME/.cargo/env"
-)
 END_TEXT
+)
 
 install_the_goods() {
     echo "[+] Installing Oh my tmux"
@@ -43,13 +43,11 @@ install_the_goods() {
     cd fonts
     ./install.sh
     cd /home/kali/Downloads/afterPMi3
-    echo "[+] Copy new config.fish to fish"
-    cp -a fishconfig.txt /home/kali/.config/fish/config.fish
-    chsh -s /usr/bin/fish    
-    echo "[+] Installing ohmyfish"
+    echo "[+] Installing ohmyfish and BobTheFish"
     curl https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install | fish
-    echo "[+] Installing BobTheFish"
     omf install bobthefish
+    echo "[+] Copy new config.fish to fish"
+    cp -f fishconfig.txt /home/kali/.config/fish/config.fish
     echo "[+] Installing Starship"
     curl -sS https://starship.rs/install.sh | sh
     cp starship.toml /home/kali/.config
@@ -59,18 +57,21 @@ install_the_goods() {
     mkdir /home/kali/Work
     mkdir /home/kali/labs
     mkdir /home/kali/kali
-    echo "[+] Installing nvm for node"
+    echo "[+] Installing nvm, fisher, bass for node"
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
     curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
     fisher install edc/bass
     touch /home/kali/.config/fish/functions/nvm.fish
     echo "$BASS" > /home/kali/.config/fish/functions/nvm.fish
-    echo "$ZSHBASH" >> /home/kali/.bashrc
-    echo "$ZSHBASH" >> /home/kali/.zshrc
+    #echo "$ZSHBASH" >> /home/kali/.bashrc
+    #echo "$ZSHBASH" >> /home/kali/.zshrc
+    #echo "[+] Using chsh to make fish the permanent shell"
+    #echo "[+] Enter kali user's password:"
+    #chsh -s /usr/bin/fish    
 }
 
 install_the_goods
-cargo install rustscan
-cargo install feroxbuster
+#cargo install rustscan
+#cargo install feroxbuster
 
 echo "You may need to close this terminal and open a new one."
