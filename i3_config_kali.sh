@@ -37,6 +37,7 @@ remove_downloads() {
     echo "[+] Removing downloaded deb files"
     rm -f /home/kali/Downloads/code_amd64.deb
     rm -f /home/kali/Downloads/vivaldi-stable_amd64.deb
+    rm -rf /home/kali/Downloads/afterPMi3/Pictures
 }
 
 # Create and cd to directory.
