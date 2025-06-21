@@ -9,18 +9,19 @@
 # and log in as kali user. Then run the final script to finish the set up.
 
 install_apt() {
+    # Some of these might have been installed already, but keeping them here anywway.
     echo "[+] Installing zaproxy guake pcmanfm fish vim-gtk3 tmux xsel terminator cmake pkg-config"
     packages=(zaproxy guake pcmanfm fish vim-gtk3 tmux xsel terminator cmake pkg-config)
-    apt update && apt install "${packages[@]}"
+    apt update && apt -y install "${packages[@]}"
 }
 
 install_vivaldi() {
     echo "[+] Installing Vivaldi"
     wget -q "https://vivaldi.com/download/vivaldi-stable_amd64.deb" -O /home/kali/Downloads/vivaldi-stable_amd64.deb
-    VIVA="vivaldi-stable_amd64.deb"
-    if [ -f "$VIVA" ]; then
-        dpkg -i /home/kali/Downloads/vivaldi-stable_amd64.deb
-    fi
+    #VIVA="vivaldi-stable_amd64.deb"
+    #if [ -f "$VIVA" ]; then
+    dpkg -i /home/kali/Downloads/vivaldi-stable_amd64.deb
+    #fi
 }
 
 install_vscode() {
@@ -39,6 +40,8 @@ remove_downloads() {
 }
 
 # Create and cd to directory.
+find /home/kali/Downloads/. -type d -exec chown kali:kali {} \;
+find /home/kali/Downloads/. -type f -exec chown kali:kali {} \;
 echo "[+] Set up i3 config for kali user."
 mkdir /home/kali/.config/i3
 chown kali:kali /home/kali/.config/i3
@@ -52,12 +55,12 @@ chown -h kali:kali i3-alt-tab.py
 ln -s /etc/i3status.conf i3status.conf
 chown -h kali:kali i3status.conf
 # Copy new config to kali user.
-cp /home/kali/downloads/afterPMi3/i3config.txt /home/kali/.config/i3/config
+cp /home/kali/Downloads/afterPMi3/i3config.txt /home/kali/.config/i3/config
 chown kali:kali /home/kali/.config/i3/config
 
 echo "[+] Set up backgrounds and feh as background switcher."
 cd /home/kali/Downloads/afterPMi3
-unzip -q Background.zip
+unzip -q Backgrounds.zip
 chown kali:kali Backgrounds
 find Backgrounds -type f -exec chown kali:kali {} \;
 mv Backgrounds /home/kali/
@@ -65,9 +68,10 @@ cp i3fehbgk /usr/bin
 unzip -q Pictures.zip
 chown kali:kali Pictures
 find Pictures -type f -exec chown kali:kali {} \;
-mv Pictures /home/kali/
+cp -a Pictures/. /home/kali/Pictures
 
 install_vivaldi
-install_vscode
+# Uncomment this if vscode isn't installed
+#install_vscode
 install_apt
 remove_downloads
