@@ -1,0 +1,44 @@
+if status is-interactive
+    # Commands to run in interactive sessions can go here
+end
+set -x PATH $PATH /home/kali/.cargo/bin
+set -x PATH $PATH /home/kali/.local/bin
+set -x PATH $PATH /usr/local/go/bin
+
+set -x GOPATH $HOME/go
+set -x PATH $PATH $GOPATH/bin
+
+# export PATH=$PATH:/usr/local/go/bin
+#set -x GOPATH $PATH /usr/local/go
+#set -x PATH $PATH $GOPATH/bin
+
+set -g theme_nerd_fonts yes
+
+# Alias
+function clogs
+    find /home/kali/tmux_buffers -name "*.log" -type f -exec rm {} \;
+    find /home/kali/tmux_logs -name "*.log" -type f -exec rm {} \;
+    echo "Emptied: /home/kali/tmux_logs and /home/kali/tmux_buffers"
+end
+
+function ll
+    ls -la $argv
+end
+
+function ipa
+    ip a show dev $argv | grep -oP '(?:\b\.?(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){4}' | head -1
+end
+
+function ipi
+    ip a show dev $argv
+end
+
+function ipis
+    ip a | grep $argv
+end
+
+function ipg
+    ip a | grep -oP '^[\d]:\s*([^:]+):' $argv
+end
+
+starship init fish | source
