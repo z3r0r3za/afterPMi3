@@ -86,6 +86,12 @@ main() {
     cp /home/kali/Downloads/afterPMi3/i3config.txt /home/kali/.config/i3/config
     chown kali:kali /home/kali/.config/i3/config
 
+    # Add extra directories.
+    mkdir /home/kali/Work && chown kali:kali /home/kali/Work
+    mkdir /home/kali/Scripts && chown kali:kali /home/kali/labs
+    mkdir /home/kali/labs && chown kali:kali /home/kali/kali
+    mkdir /home/kali/kali && chown kali:kali /home/kali/Scripts
+
     # Clean up permissions for kali user.
     find /home/kali/Downloads -type d -exec chown kali:kali {} \;
     find /home/kali/Downloads -type f -exec chown kali:kali {} \;
@@ -112,7 +118,6 @@ main() {
     echo "[+] To reboot press Alt-Shift-E, then press r."
     echo "[+] To log in press Alt-Shift-E, then press e."
     echo "[+] In the top right menu, select i3 and log in as kali."
-
 }
 
 main
