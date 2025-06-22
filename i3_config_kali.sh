@@ -57,6 +57,47 @@ install_vscode() {
     fi
 }
 
+# Function to download, unzip, set permissions, and move ZIP files
+download_zip_files() {
+    echo "[+] Download and set up of a few more fonts."
+    local URL1="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip"
+    local URL2="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Monoid.zip"
+    local URL3="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Hack.zip"
+    local TARGET="/home/kali/.local/share/fonts"
+    local DESTINATION="/home/kali/Downloads/fonts"
+
+    # Download the ZIP files
+    echo "[+] Downloading and checking font zip files."
+    wget -q "$URL1" --directory $DESTINATION || true
+    wget -q "$URL2" --directory $DESTINATION || true
+    wget -q "$URL3" --directory $DESTINATION || true
+
+    if [[ ! -f "$DESTINATION/FiraCode.zip" && ! -f "$DESTINATION/Monoid.zip" && ! -f "$DESTINATION/Hack.zip" ]]; then
+        echo "Failed to download ZIP files. Please check the URLs or network connection."
+        exit 1
+    fi
+
+    # Set ownership and permissions
+    echo "[+] Setting permissions of downloaded zip files."
+    chown -R kali:kali $DESTINATION/*
+    chmod -R 755 $DESTINATION/*
+
+    # Unzip the files to target.
+    echo "[+] Unzipping files to target directory."
+    unzip -q $DESTINATION/FiraCode.zip -d $TARGET || true
+    unzip -q $DESTINATION/Monoid.zip -d $TARGET || true
+    unzip -q $DESTINATION/Hack.zip -d $TARGET || true
+
+    # Set ownership and permissions
+    echo "[+] Setting permissions of fonts."
+    chown -R kali:kali $TARGET/*
+    chmod -R 755 $TARGET/*
+
+    # Move unzipped files to target directory (if needed)
+    #echo "[+] Moving fonts to user's directory."
+    #mv $DESTINATION/* $TARGET || true
+}
+
 # Remove downloaded files and directories.
 remove_downloads() {
     echo "[+] Removing temporary files and downloads."
