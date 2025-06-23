@@ -224,9 +224,9 @@ main() {
     mkdir /home/kali/tmux_buffers && chown kali:kali /home/kali/tmux_buffers
     mkdir /home/kali/tmux_logs && chown kali:kali /home/kali/tmux_logs
     mkdir /home/kali/Work && chown kali:kali /home/kali/Work
-    mkdir /home/kali/Scripts && chown kali:kali /home/kali/labs
-    mkdir /home/kali/labs && chown kali:kali /home/kali/kali
-    mkdir /home/kali/kali && chown kali:kali /home/kali/Scripts
+    mkdir /home/kali/Scripts && chown kali:kali /home/kali/Scripts
+    mkdir /home/kali/labs && chown kali:kali /home/kali/labs
+    mkdir /home/kali/kali && chown kali:kali /home/kali/kali
 
     # Clean up permissions for kali user.
     find /home/kali/Downloads -type d -exec chown kali:kali {} \;
