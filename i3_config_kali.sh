@@ -85,18 +85,40 @@ install_fonts() {
 
     # Unzip the files to target.
     echo "[+] Unzipping files to target directory."
-    unzip -q $DESTINATION/FiraCode.zip -d $TARGET || true
-    unzip -q $DESTINATION/Monoid.zip -d $TARGET || true
-    unzip -q $DESTINATION/Hack.zip -d $TARGET || true
+    unzip -q $DESTINATION/FiraCode.zip -d $DESTINATION || true
+    unzip -q $DESTINATION/Monoid.zip -d $DESTINATION || true
+    unzip -q $DESTINATION/Hack.zip -d $DESTINATION || true
 
-    # Set ownership and permissions
+    # Copy fonts to target directory.
+    echo "[+] Moving fonts to target directory."
+    # List of font directories to copy from.
+    declare -a source_dirs
+    source_dirs=( "$DESTINATION/FiraCode" "$DESTINATION/Monoid" "$DESTINATION/Hack" )
+
+    # Loop through each source directory
+    for dir in "${source_dirs[@]}";
+    do
+        # List all files in the current directory, excluding LICENCE and README
+        ls "$dir" | grep -v "LICENCE|README.md" >| $TEMP_FILES
+
+        # Copy the files to the target directory
+        cp -r "$dir/" "$TARGET/".<$(date +s)
+
+        # Remove the temp file list after use (optional for cleanup)
+        rm $TEMP_FILES
+    done
+
+    # Set ownership and permissions of installed fonts.
     echo "[+] Setting permissions of fonts."
     chown -R kali:kali $TARGET/*
     chmod -R 755 $TARGET/*
+    
+    # Reload font cache.
+    fc-cache -f /home/kali/.local/share/fonts
 
-    # Move unzipped files to target directory (if needed)
-    #echo "[+] Moving fonts to user's directory."
-    #mv $DESTINATION/* $TARGET || true
+    # Remove font directories after they are installed.
+    echo "[+] Removing font directories."
+    rm -rf $DESTINATION/{FiraCode,Monoid,Hack}
 }
 
 install_rust_tools() {
@@ -118,8 +140,8 @@ enable_fish() {
 }
     
 setup_shell() {
-  local REG_USER="$1"
-  su "$REGUSER" <<'EOF'
+  local KUSER="$1"
+  su "$KUSER" <<'EOF'
 echo "[+] Installing Oh my tmux"
 cd /home/kali
 git clone --single-branch https://github.com/gpakosz/.tmux.git
