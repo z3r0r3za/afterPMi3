@@ -85,33 +85,53 @@ install_fonts() {
 
     # Unzip the files to target.
     echo "[+] Unzipping files to target directory."
-    unzip -q $DESTINATION/FiraCode.zip -d $DESTINATION || true
-    unzip -q $DESTINATION/Monoid.zip -d $DESTINATION || true
-    unzip -q $DESTINATION/Hack.zip -d $DESTINATION || true
+    unzip -q $DESTINATION/FiraCode.zip -d $DESTINATION/FiraCode || true
+    unzip -q $DESTINATION/Monoid.zip -d $DESTINATION/Monoid || true
+    unzip -q $DESTINATION/Hack.zip -d $DESTINATION/Hack || true
 
     # Copy fonts to target directory.
     echo "[+] Moving fonts to target directory."
-    # List of font directories to copy from.
-    declare -a source_dirs
-    source_dirs=( "$DESTINATION/FiraCode" "$DESTINATION/Monoid" "$DESTINATION/Hack" )
+    # Font source directories.
+    FONT_SOURCED=("$DESTINATION/FiraCode" "$DESTINATION/Monoid" "$DESTINATION/Hack")
+
+    # Font destination directory.
+    #FONT_DESTD="/home/kali/.local/share/fonts"
+    #mkdir -p "$DESTD"
+
+    # Excluded filenames from font directory
+    EXCLUDED_FILES=("LICENSE" "README.md")
 
     # Loop through each source directory
-    for dir in "${source_dirs[@]}";
-    do
-        # List all files in the current directory, excluding LICENCE and README
-        ls "$dir" | grep -v "LICENCE|README.md" >| $TEMP_FILES
-
-        # Copy the files to the target directory
-        cp -r "$dir/" "$TARGET/".<$(date +s)
-
-        # Remove the temp file list after use (optional for cleanup)
-        rm $TEMP_FILES
+    for dir in "${FONT_SOURCED[@]}"; do
+    find "$dir" -type f \( \
+        ! -name "${EXCLUDED_FILES[0]}" -a \
+        ! -name "${EXCLUDED_FILES[1]}" \
+    \) -exec cp {} "$TARGET" \;
     done
+    
+    # Copy fonts to target directory.
+    echo "[+] Moving fonts to target directory."
+    # List of font directories to copy from.
+    #declare -a source_dirs
+    #source_dirs=( "$DESTINATION/FiraCode" "$DESTINATION/Monoid" "$DESTINATION/Hack" )
+    #
+    # Loop through each source directory
+    #for dir in "${source_dirs[@]}";
+    #do
+    #    # List all files in the current directory, excluding LICENCE and README
+    #    ls "$dir" | grep -v "LICENCE|README.md" >| $TEMP_FILES
+    #
+    #    # Copy the files to the target directory
+    #    cp -r "$dir/" "$TARGET/".<$(date +s)
+    #
+    #    # Remove the temp file list after use (optional for cleanup)
+    #    rm $TEMP_FILES
+    #done
 
     # Set ownership and permissions of installed fonts.
     echo "[+] Setting permissions of fonts."
-    chown -R kali:kali $TARGET/*
-    chmod -R 755 $TARGET/*
+    find $TARGET -type f -exec chown -R kali:kali {} \;
+    find $TARGET -type f -exec chmod -R 644 {} \;
     
     # Reload font cache.
     fc-cache -f /home/kali/.local/share/fonts
