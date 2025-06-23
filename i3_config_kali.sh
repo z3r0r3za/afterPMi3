@@ -111,6 +111,11 @@ remove_downloads() {
     rm -rf "$DOWNLOADS"/code_amd64.deb "$DOWNLOADS"/vivaldi-stable_amd64.deb "$DOWNLOADS/afterPMi3/Pictures" 2>/dev/null
 }
 
+enable_fish() {
+    echo "[+] Permanently enable fish for kali user."
+    chsh -s /usr/bin/fish kali
+}
+    
 my_function() {
   local REG_USER="$1"
   su "$REGUSER" <<'EOF'
@@ -148,7 +153,6 @@ echo "$BASS" > /home/kali/.config/fish/functions/nvm.fish
 #echo "$ZSHBASH" >> /home/kali/.zshrc
 #echo "[+] Using chsh to make fish the permanent shell"
 #echo "[+] Enter kali user's password:"
-chsh -s /usr/bin/fish
 EOF
 }
 
@@ -204,7 +208,7 @@ main() {
     install_vivaldi
     install_fonts
     remove_downloads
-    install_shell "kali"
+    enable_fish
 
     echo "[+] Reboot or login as kali user to apply changes."
     echo "[+] To reboot press Alt-Shift-E, then press r."
