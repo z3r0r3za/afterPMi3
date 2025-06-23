@@ -57,14 +57,15 @@ install_vscode() {
     fi
 }
 
-# Function to download, unzip, set permissions, and move ZIP files
-download_zip_files() {
+# Download, unzip, set permissions, and move these 3 fonts for kali user.
+install_fonts() {
+    mkdir /home/kali/Downloads/extra_fonts && chown kali:kali /home/kali/Downloads/extra_fonts
     echo "[+] Download and set up of a few more fonts."
     local URL1="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip"
     local URL2="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Monoid.zip"
     local URL3="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Hack.zip"
     local TARGET="/home/kali/.local/share/fonts"
-    local DESTINATION="/home/kali/Downloads/fonts"
+    local DESTINATION="/home/kali/Downloads/extra_fonts"
 
     # Download the ZIP files
     echo "[+] Downloading and checking font zip files."
@@ -98,11 +99,57 @@ download_zip_files() {
     #mv $DESTINATION/* $TARGET || true
 }
 
+install_rust_tools() {
+    cargo install rustscan
+    cargo install feroxbuster
+}
+
 # Remove downloaded files and directories.
 remove_downloads() {
     echo "[+] Removing temporary files and downloads."
     local DOWNLOADS="/home/kali/Downloads"
     rm -rf "$DOWNLOADS"/code_amd64.deb "$DOWNLOADS"/vivaldi-stable_amd64.deb "$DOWNLOADS/afterPMi3/Pictures" 2>/dev/null
+}
+
+my_function() {
+  local REG_USER="$1"
+  su "$REGUSER" <<'EOF'
+echo "[+] Installing Oh my tmux"
+cd /home/kali
+git clone --single-branch https://github.com/gpakosz/.tmux.git
+ln -s -f .tmux/.tmux.conf
+#cp .tmux/.tmux.conf.local .
+cp /home/kali/Downloads/afterPMi3/tmux.conf.txt /home/kali/.tmux.conf.local
+echo "[+] Installing Powerline Fonts"
+cd /home/kali/Downloads
+git clone https://github.com/powerline/fonts.git
+cd fonts
+./install.sh
+cd /home/kali
+echo "[+] Installing Starship"
+curl -sS https://starship.rs/install.sh | sh
+cp /home/kali/Downloads/afterPMi3/starship.toml /home/kali/.config
+echo "[+] Installing ohmyfish and BobTheFish"
+curl https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install | fish --init-command 'set argv -- --noninteractive'
+fish -c "omf install bobthefish"
+echo "[+] Copy new config.fish to fish"
+mkdir -p /home/kali/.config/fish
+cp -f fishconfig.txt /home/kali/.config/fish/config.fish
+echo "[+] Reload config.fish"
+source /home/kali/.config/fish/config.fish
+echo "[+] Installing nvm, fisher, bass for node"
+mkdir -p /home/kali/.config/fish/functions
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
+fisher install edc/bass
+touch /home/kali/.config/fish/functions/nvm.fish
+echo "$BASS" > /home/kali/.config/fish/functions/nvm.fish
+#echo "$ZSHBASH" >> /home/kali/.bashrc
+#echo "$ZSHBASH" >> /home/kali/.zshrc
+#echo "[+] Using chsh to make fish the permanent shell"
+#echo "[+] Enter kali user's password:"
+chsh -s /usr/bin/fish
+EOF
 }
 
 # Main setup function.
@@ -128,6 +175,8 @@ main() {
     chown kali:kali /home/kali/.config/i3/config
 
     # Add extra directories.
+    mkdir /home/kali/tmux_buffers && chown kali:kali /home/kali/tmux_buffers
+    mkdir /home/kali/tmux_logs && chown kali:kali /home/kali/tmux_logs
     mkdir /home/kali/Work && chown kali:kali /home/kali/Work
     mkdir /home/kali/Scripts && chown kali:kali /home/kali/labs
     mkdir /home/kali/labs && chown kali:kali /home/kali/kali
@@ -153,7 +202,9 @@ main() {
     install_apt
     install_vscode
     install_vivaldi
+    install_fonts
     remove_downloads
+    install_shell "kali"
 
     echo "[+] Reboot or login as kali user to apply changes."
     echo "[+] To reboot press Alt-Shift-E, then press r."
