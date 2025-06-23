@@ -128,10 +128,16 @@ install_fonts() {
     #    rm $TEMP_FILES
     #done
 
-    # Set ownership and permissions of installed fonts.
-    echo "[+] Setting permissions of fonts."
-    find $TARGET -type f -exec chown -R kali:kali {} \;
-    find $TARGET -type f -exec chmod -R 644 {} \;
+    echo "[+] Installing Powerline Fonts"
+    cd /home/kali/Downloads
+    git clone https://github.com/powerline/fonts.git
+    cd fonts
+    ./install.sh
+    cp -r /root/.local/share/fonts/. $TARGET
+    echo "[+] Setting permissions of all fonts."
+    find $TARGET -type d -exec chown kali:kali {} \;
+    find $TARGET/. -type f -exec chown -R kali:kali {} \;
+    cd /home/kali/Downloads
     
     # Reload font cache.
     fc-cache -f /home/kali/.local/share/fonts
@@ -139,6 +145,7 @@ install_fonts() {
     # Remove font directories after they are installed.
     echo "[+] Removing font directories."
     rm -rf $DESTINATION/{FiraCode,Monoid,Hack}
+    rm -rf cd /home/kali/Downloads/fonts
 }
 
 install_rust_tools() {
@@ -168,15 +175,7 @@ git clone --single-branch https://github.com/gpakosz/.tmux.git
 ln -s -f .tmux/.tmux.conf
 #cp .tmux/.tmux.conf.local .
 cp /home/kali/Downloads/afterPMi3/tmux.conf.txt /home/kali/.tmux.conf.local
-echo "[+] Installing Powerline Fonts"
-cd /home/kali/Downloads
-git clone https://github.com/powerline/fonts.git
-cd fonts
-./install.sh
 cd /home/kali
-echo "[+] Installing Starship"
-curl -sS https://starship.rs/install.sh | sh
-cp /home/kali/Downloads/afterPMi3/starship.toml /home/kali/.config
 echo "[+] Installing ohmyfish and BobTheFish"
 curl https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install | fish --init-command 'set argv -- --noninteractive'
 fish -c "omf install bobthefish"
@@ -245,13 +244,18 @@ main() {
         rm -r /home/kali/Pictures
         mv Pictures /home/kali
 
+    echo "[+] Installing Starship"
+    curl -sS https://starship.rs/install.sh | sh
+    cp /home/kali/Downloads/afterPMi3/starship.toml /home/kali/.config
+    chown kali:kali /home/kali/.config/starship.toml
+        
     # Install necessary tools, applications, and clean up remaining files.
     install_apt
     install_vscode
     install_vivaldi
     install_fonts
     remove_downloads
-    setup_shell
+    setup_shell "kali"
     enable_fish
 
     echo "[+] Reboot or login as kali user to apply changes."
