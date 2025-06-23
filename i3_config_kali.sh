@@ -112,11 +112,12 @@ remove_downloads() {
 }
 
 enable_fish() {
+    # Run as root
     echo "[+] Permanently enable fish for kali user."
     chsh -s /usr/bin/fish kali
 }
     
-my_function() {
+setup_shell() {
   local REG_USER="$1"
   su "$REGUSER" <<'EOF'
 echo "[+] Installing Oh my tmux"
@@ -208,6 +209,7 @@ main() {
     install_vivaldi
     install_fonts
     remove_downloads
+    setup_shell
     enable_fish
 
     echo "[+] Reboot or login as kali user to apply changes."
