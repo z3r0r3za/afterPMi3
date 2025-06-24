@@ -154,11 +154,25 @@ install_rust_tools() {
     cargo install feroxbuster
 }
 
-# Remove downloaded files and directories.
+# Remove some downloaded files and directories.
 remove_downloads() {
     echo "[+] Removing temporary files and downloads."
     local DOWNLOADS="/home/kali/Downloads"
-    rm -rf "$DOWNLOADS"/code_amd64.deb "$DOWNLOADS"/vivaldi-stable_amd64.deb "$DOWNLOADS/afterPMi3/Pictures" 2>/dev/null
+    FILES=("$DOWNLOADS/code_amd64.deb" "$DOWNLOADS/vivaldi-stable_amd64.deb" "$DOWNLOADS/afterPMi3/Pictures")
+    
+    if [ -f "${FILES[0]}" ]; then
+        # If the file exists, delete it
+        rm -rf "${FILES[0]}"
+    fi
+    if [ -f "${FILES[1]}" ]; then
+        # If the file exists, delete it
+        rm -rf "${FILES[1]}"
+    fi
+    if [ -f "${FILES[2]}" ]; then
+        # If the file exists, delete it
+        rm -rf "${FILES[2]}"
+    fi    
+    #rm -rf "$DOWNLOADS"/code_amd64.deb "$DOWNLOADS"/vivaldi-stable_amd64.deb "$DOWNLOADS"/afterPMi3/Pictures 2>/dev/null
 }
 
 enable_fish() {
