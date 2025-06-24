@@ -57,7 +57,7 @@ install_vscode() {
     fi
 }
 
-# Download, unzip, set permissions, and move these 3 fonts for kali user.
+# Install fonts for kali user.
 install_fonts() {
     mkdir /home/kali/Downloads/extra_fonts && chown kali:kali /home/kali/Downloads/extra_fonts
     echo "[+] Download and set up of a few more fonts."
@@ -67,7 +67,7 @@ install_fonts() {
     local TARGET="/home/kali/.local/share/fonts"
     local DESTINATION="/home/kali/Downloads/extra_fonts"
 
-    # Download the ZIP files
+    # Download the zip files.
     echo "[+] Downloading and checking font zip files."
     wget -q "$URL1" --directory $DESTINATION || true
     wget -q "$URL2" --directory $DESTINATION || true
@@ -78,10 +78,8 @@ install_fonts() {
         exit 1
     fi
 
-    # Set ownership and permissions
-    echo "[+] Setting permissions of downloaded zip files."
-    chown -R kali:kali $DESTINATION/*
-    chmod -R 755 $DESTINATION/*
+    # Set ownership.
+    chown -R kali:kali $DESTINATION
 
     # Unzip the files to target.
     echo "[+] Unzipping files to target directory."
@@ -94,10 +92,13 @@ install_fonts() {
     # Font source directories.
     FONT_SOURCED=("$DESTINATION/FiraCode" "$DESTINATION/Monoid" "$DESTINATION/Hack")
 
-    # Font destination directory.
-    #FONT_DESTD="/home/kali/.local/share/fonts"
-    #mkdir -p "$DESTD"
-
+    # Font target directory.
+    FONT_DESTD="/home/kali/.local/share/fonts"
+    if [ ! -d "$FONT_DESTD" ]; then
+        mkdir $FONT_DESTD
+        chown kali:kali $FONT_DESTD
+    fi
+    
     # Excluded filenames from font directory
     EXCLUDED_FILES=("LICENSE" "README.md")
 
@@ -110,7 +111,7 @@ install_fonts() {
     done
     
     # Copy fonts to target directory.
-    echo "[+] Moving fonts to target directory."
+    #echo "[+] Moving fonts to target directory."
     # List of font directories to copy from.
     #declare -a source_dirs
     #source_dirs=( "$DESTINATION/FiraCode" "$DESTINATION/Monoid" "$DESTINATION/Hack" )
@@ -228,11 +229,11 @@ main() {
     mkdir -p /home/kali/labs && chown kali:kali /home/kali/labs
     mkdir -p /home/kali/kali && chown kali:kali /home/kali/kali
 
-    # Clean up permissions for kali user.
+    # Set owner for kali user.
     find /home/kali/Downloads -type d -exec chown kali:kali {} \;
     find /home/kali/Downloads -type f -exec chown kali:kali {} \;
 
-    # Set background and pictures
+    # Set backgrounds and pictures
     echo "[+] Setting up backgrounds."
     cd /home/kali/Downloads/afterPMi3 && \
         cp i3fehbgk /usr/bin && \
@@ -248,12 +249,11 @@ main() {
 
     if [ ! -d "/home/kali/Backgrounds" ]; then
         mv Backgrounds /home/kali
-        echo "[-] Background directory already exists."
     fi
     if [ -d "/home/kali/Pictures" ]; then
-        mv Pictures/. /home/kali/Pictures
-    else
         mv Pictures /home/kali
+    else
+        mv Pictures/. /home/kali/Pictures
     fi
     # Define source directories
     #source_dirs=("Backgrounds" "Pictures") 
@@ -276,9 +276,10 @@ main() {
     cp /home/kali/Downloads/afterPMi3/starship.toml /home/kali/.config
     chown kali:kali /home/kali/.config/starship.toml
         
-    # Install necessary tools, applications, and clean up remaining files.
+    # Install some tools, applications, and clean up.
     install_apt
-    install_vscode
+    #install_rust_tools
+    #install_vscode
     install_vivaldi
     install_fonts
     remove_downloads
