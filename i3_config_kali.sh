@@ -221,12 +221,12 @@ main() {
     chown kali:kali /home/kali/.config/i3/config
 
     # Add extra directories.
-    mkdir /home/kali/tmux_buffers && chown kali:kali /home/kali/tmux_buffers
-    mkdir /home/kali/tmux_logs && chown kali:kali /home/kali/tmux_logs
-    mkdir /home/kali/Work && chown kali:kali /home/kali/Work
-    mkdir /home/kali/Scripts && chown kali:kali /home/kali/Scripts
-    mkdir /home/kali/labs && chown kali:kali /home/kali/labs
-    mkdir /home/kali/kali && chown kali:kali /home/kali/kali
+    mkdir -p /home/kali/tmux_buffers && chown kali:kali /home/kali/tmux_buffers
+    mkdir -p /home/kali/tmux_logs && chown kali:kali /home/kali/tmux_logs
+    mkdir -p /home/kali/Work && chown kali:kali /home/kali/Work
+    mkdir -p /home/kali/Scripts && chown kali:kali /home/kali/Scripts
+    mkdir -p /home/kali/labs && chown kali:kali /home/kali/labs
+    mkdir -p /home/kali/kali && chown kali:kali /home/kali/kali
 
     # Clean up permissions for kali user.
     find /home/kali/Downloads -type d -exec chown kali:kali {} \;
@@ -235,17 +235,44 @@ main() {
     # Set background and pictures
     echo "[+] Setting up backgrounds."
     cd /home/kali/Downloads/afterPMi3 && \
-        unzip -q Backgrounds.zip && \
-        mv Backgrounds /home/kali && \
         cp i3fehbgk /usr/bin && \
+        unzip -q Backgrounds.zip && \
         unzip -q Pictures.zip && \
         chown kali:kali Pictures && \
-        find Pictures -type f -exec chown kali:kali {} \; && \
-        rm -r /home/kali/Pictures
+        find Pictures/. -type f -exec chown kali:kali {} \ && \
+        chown kali:kali Backgrounds && \
+        find Backgrounds/. -type f -exec chown kali:kali {} \;
+        #rm -r /home/kali/Pictures
+        # If pictures exists, just move the files.
+        #mv Pictures /home/kali
+
+    if [ ! -d "/home/kali/Backgrounds" ]; then
+        mv Backgrounds /home/kali
+        echo "[-] Background directory already exists."
+    fi
+    if [ -d "/home/kali/Pictures" ]; then
+        mv Pictures/. /home/kali/Pictures
+    else
         mv Pictures /home/kali
+    fi
+    # Define source directories
+    #source_dirs=("Backgrounds" "Pictures") 
+    # Define the destination directory
+    #destination_dir="/path/to/destination"
+    # Loop through each source directory
+    #for dir in "${source_dirs[@]}"; do
+    #  # Check if the directory exists in the destination
+    #  if [ ! -d "$destination_dir/$dir" ]; then 
+    #    echo "Moving $dir to $destination_dir..."
+    #    mv "$dir" "$destination_dir/"
+    #  else
+    #    echo "Directory $destination_dir/$dir already exists. Skipping."
+    #  fi
+    #done
 
     echo "[+] Installing Starship"
-    curl -sS https://starship.rs/install.sh | sh
+    curl -sS https://starship.rs/install.sh -y | sh
+    #sh <(curl -sS https://starship.rs/install.sh) -- -y
     cp /home/kali/Downloads/afterPMi3/starship.toml /home/kali/.config
     chown kali:kali /home/kali/.config/starship.toml
         
