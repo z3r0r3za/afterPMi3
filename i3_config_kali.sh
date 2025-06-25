@@ -6,6 +6,15 @@
 # /home/kali/Downloads/afterPMi3/i3config.txt
 # It handles the tasks at first boot as root before configuring and switching to kali user.
 
+# Paths for go and rust to go in zshrc/bashrc.
+ZSHBASH=$(cat <<-END_TEXT
+export GOPATH=$HOME/go
+export PATH=$PATH:$GOPATH/bin
+export PATH=$PATH:/usr/local/go/bin
+source "$HOME/.cargo/env"
+END_TEXT
+)
+
 # Install packages.
 install_apt() {
     echo "[+] Installing required tools"
@@ -180,38 +189,51 @@ enable_fish() {
     echo "[+] Permanently enable fish for kali user."
     chsh -s /usr/bin/fish kali
 }
-    
-setup_shell() {
-  local KUSER="$1"
-  su "$KUSER" <<'EOF'
-echo "[+] Installing Oh my tmux"
-cd /home/kali
-git clone --single-branch https://github.com/gpakosz/.tmux.git
-ln -s -f .tmux/.tmux.conf
-#cp .tmux/.tmux.conf.local .
-cp /home/kali/Downloads/afterPMi3/tmux.conf.txt /home/kali/.tmux.conf.local
-cd /home/kali
-echo "[+] Installing ohmyfish and BobTheFish"
-curl https://raw.githubusercontent.com/oh-my-fish/oh-my-fish/master/bin/install | fish --init-command 'set argv -- --noninteractive'
-fish -c "omf install bobthefish"
-echo "[+] Copy new config.fish to fish"
-mkdir -p /home/kali/.config/fish
-cp -f fishconfig.txt /home/kali/.config/fish/config.fish
-echo "[+] Reload config.fish"
-source /home/kali/.config/fish/config.fish
-echo "[+] Installing nvm, fisher, bass for node"
-mkdir -p /home/kali/.config/fish/functions
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
-fisher install edc/bass
-touch /home/kali/.config/fish/functions/nvm.fish
-echo "$BASS" > /home/kali/.config/fish/functions/nvm.fish
-#echo "$ZSHBASH" >> /home/kali/.bashrc
-#echo "$ZSHBASH" >> /home/kali/.zshrc
-#echo "[+] Using chsh to make fish the permanent shell"
-#echo "[+] Enter kali user's password:"
-EOF
+
+install_fish_config() {
+    cd /home/kali/Downloads/afterPMi3/
+    local FISHDIR="/home/kali/.config/fish"
+    local CONFDIR="/home/kali/.config"
+    if [ -d "$FISHDIR" ]; then
+        rm -rf $FISHDIR
+        unzip -q fish.zip -d $CONFDIR || true
+    fi
+    if [ ! -d "$FISHDIR" ]; then
+        unzip -q fish.zip -d $CONFDIR || true
+    fi
 }
+
+install_ohmytmux() {
+    echo "[+] Installing Oh-my-tmux"
+    cd /home/kali
+    git clone --single-branch https://github.com/gpakosz/.tmux.git
+    chown kali:kali .tmux
+    chown kali:kali -R .tmux/*
+    chown kali:kali -R .tmux/.[^.]*
+    ln -s -f .tmux/.tmux.conf
+    chown -h kali:kali .tmux.conf
+    # Commenting this line because the config already exists.
+    #cp .tmux/.tmux.conf.local .
+    cp /home/kali/Downloads/afterPMi3/tmux.conf.txt /home/kali/.tmux.conf.local
+    chown kali:kali .tmux.conf.local
+}
+
+#setup_tmux() {
+#  local KUSER="$1"
+#  su "$KUSER" <<'EOF'
+#echo "[+] Installing Oh my tmux"
+#cd /home/kali
+#git clone --single-branch https://github.com/gpakosz/.tmux.git
+#ln -s -f .tmux/.tmux.conf
+##cp .tmux/.tmux.conf.local .
+#cp /home/kali/Downloads/afterPMi3/tmux.conf.txt /home/kali/.tmux.conf.local
+#cd /home/kali
+##echo "$ZSHBASH" >> /home/kali/.bashrc
+##echo "$ZSHBASH" >> /home/kali/.zshrc
+##echo "[+] Using chsh to make fish the permanent shell"
+##echo "[+] Enter kali user's password:"
+#EOF
+#}
 
 # Main setup function.
 main() {
@@ -254,7 +276,7 @@ main() {
         unzip -q Backgrounds.zip && \
         unzip -q Pictures.zip && \
         chown kali:kali Pictures && \
-        find Pictures/. -type f -exec chown kali:kali {} \ && \
+        find Pictures/. -type f -exec chown kali:kali {} \; && \
         chown kali:kali Backgrounds && \
         find Backgrounds/. -type f -exec chown kali:kali {} \;
         #rm -r /home/kali/Pictures
@@ -284,8 +306,10 @@ main() {
     #  fi
     #done
 
-    echo "[+] Installing Starship"
-    curl -sS https://starship.rs/install.sh -y | sh
+    # Install starship later if desired.
+    #echo "[+] Installing Starship"
+    #curl -sS https://starship.rs/install.sh -y | sh
+    #curl -sS https://starship.rs/install.sh | sh
     #sh <(curl -sS https://starship.rs/install.sh) -- -y
     cp /home/kali/Downloads/afterPMi3/starship.toml /home/kali/.config
     chown kali:kali /home/kali/.config/starship.toml
@@ -297,7 +321,8 @@ main() {
     install_vivaldi
     install_fonts
     remove_downloads
-    setup_shell "kali"
+    #setup_tmux "kali"
+    install_ohmytmux
     enable_fish
 
     echo "[+] Reboot or login as kali user to apply changes."
@@ -307,4 +332,3 @@ main() {
 }
 
 main
-
