@@ -208,8 +208,8 @@ install_ohmytmux() {
     cd /home/kali
     git clone --single-branch https://github.com/gpakosz/.tmux.git
     chown kali:kali .tmux
-    chown kali:kali -R .tmux/*
-    chown kali:kali -R .tmux/.[^.]*
+    chown -R kali:kali .tmux/*
+    chown -R kali:kali .tmux/.[^.]*
     ln -s -f .tmux/.tmux.conf
     chown -h kali:kali .tmux.conf
     # Commenting this line because the config already exists.
@@ -321,10 +321,11 @@ main() {
     install_vivaldi
     install_fonts
     remove_downloads
-    #setup_tmux "kali"
     install_ohmytmux
+    install_fish_config
     enable_fish
 
+    # /usr/bin/vmhgfs-fuse .host:/kali /home/shared -o subtype=vmhgfs-fuse
     echo "[+] Reboot or login as kali user to apply changes."
     echo "[+] To reboot press Alt-Shift-E, then press r."
     echo "[+] To log in press Alt-Shift-E, then press e."
