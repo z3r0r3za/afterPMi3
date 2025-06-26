@@ -20,7 +20,7 @@ END_TEXT
 
 # Install packages.
 install_apt() {
-    echo "[+] Installing required tools"
+    echo "[+] Installing some packages."
     local packages=(
         zaproxy guake pcmanfm fish vim-gtk3 tmux xsel terminator cmake pkg-config
     )
@@ -71,6 +71,7 @@ install_vscode() {
 
 # Install fonts for kali user.
 install_fonts() {
+    echo "[+] Installing some Nerd-fonts."
     mkdir /home/kali/Downloads/extra_fonts && chown kali:kali /home/kali/Downloads/extra_fonts
     echo "[+] Download and set up of a few more fonts."
     local URL1="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip"
@@ -80,7 +81,6 @@ install_fonts() {
     local DESTINATION="/home/kali/Downloads/extra_fonts"
 
     # Download the zip files.
-    echo "[+] Downloading and checking font zip files."
     wget -q "$URL1" --directory $DESTINATION || true
     wget -q "$URL2" --directory $DESTINATION || true
     wget -q "$URL3" --directory $DESTINATION || true
@@ -94,14 +94,11 @@ install_fonts() {
     chown -R kali:kali $DESTINATION
 
     # Unzip the files to target.
-    echo "[+] Unzipping files to target directory."
     unzip -q $DESTINATION/FiraCode.zip -d $DESTINATION/FiraCode || true
     unzip -q $DESTINATION/Monoid.zip -d $DESTINATION/Monoid || true
     unzip -q $DESTINATION/Hack.zip -d $DESTINATION/Hack || true
 
     # Copy fonts to target directory.
-    echo "[+] Moving fonts to target directory."
-    # Font source directories.
     FONT_SOURCED=("$DESTINATION/FiraCode" "$DESTINATION/Monoid" "$DESTINATION/Hack")
 
     # Font target directory.
@@ -122,13 +119,12 @@ install_fonts() {
     \) -exec cp {} "$TARGET" \;
     done
 
-    echo "[+] Installing Powerline Fonts"
+    echo "[+] Installing Powerline fonts"
     cd /home/kali/Downloads
     git clone https://github.com/powerline/fonts.git
     cd fonts
     ./install.sh
     cp -r /root/.local/share/fonts/. $TARGET
-    echo "[+] Setting permissions of all fonts."
     find $TARGET -type d -exec chown kali:kali {} \;
     find $TARGET/. -type f -exec chown -R kali:kali {} \;
     cd /home/kali/Downloads
@@ -137,9 +133,8 @@ install_fonts() {
     fc-cache -f /home/kali/.local/share/fonts
 
     # Remove font directories after they are installed.
-    echo "[+] Removing font directories."
     rm -rf $DESTINATION/{FiraCode,Monoid,Hack}
-    rm -rf cd /home/kali/Downloads/fonts
+    rm -rf /home/kali/Downloads/fonts
 }
 
 install_rust_tools() {
@@ -149,7 +144,7 @@ install_rust_tools() {
 
 # Remove some downloaded files and directories.
 remove_downloads() {
-    echo "[+] Removing temporary files and downloads."
+    echo "[+] Removing some temporary files and downloads."
     local DOWNLOADS="/home/kali/Downloads"
     FILES=("$DOWNLOADS/code_amd64.deb" "$DOWNLOADS/vivaldi-stable_amd64.deb" "$DOWNLOADS/afterPMi3/Pictures")
     
@@ -175,6 +170,7 @@ enable_fish() {
 }
 
 install_fish_config() {
+    echo "[+] Set up fish config for kali user."
     cd /home/kali/Downloads/afterPMi3/
     local FISHDIR="/home/kali/.config/fish"
     local CONFDIR="/home/kali/.config"
@@ -203,6 +199,7 @@ install_ohmytmux() {
 }
 
 install_nvm() {
+    echo "[+] Install nvm for kali user."
     cd /home/kali
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
     #wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
@@ -210,8 +207,9 @@ install_nvm() {
 
 # Main setup function.
 main() {
-    echo "[+] First boot as root setup for i3 Kali user."
+    echo "[+] Starting first boot as root setup for i3 kali user."
 
+    echo "[+] Set up i3 config."
     # Set up i3 config directory and permissions.
     mkdir -p /home/kali/.config/i3
     chown kali:kali /home/kali/.config/i3
@@ -230,6 +228,7 @@ main() {
     cp /home/kali/Downloads/afterPMi3/i3config.txt /home/kali/.config/i3/config
     chown kali:kali /home/kali/.config/i3/config
 
+    echo "[+] Create some directories."
     # Add extra directories.
     mkdir -p /home/kali/tmux_buffers && chown kali:kali /home/kali/tmux_buffers
     mkdir -p /home/kali/tmux_logs && chown kali:kali /home/kali/tmux_logs
@@ -266,7 +265,7 @@ main() {
     fi
 
     # Install starship later if desired.
-    #echo "[+] Installing Starship"
+    echo "[+] Set up Starship config."
     #curl -sS https://starship.rs/install.sh -y | sh
     #curl -sS https://starship.rs/install.sh | sh
     #sh <(curl -sS https://starship.rs/install.sh) -- -y
