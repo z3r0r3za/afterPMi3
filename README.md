@@ -1,5 +1,7 @@
 This is what I use to finish setting up kali after running [pimpmyi3](https://github.com/Dewalt-arch/pimpmyi3).
 
+pimpmyi3 will also download and run [pimpmykali](https://github.com/Dewalt-arch/pimpmykali)
+
 Run i3_config_kali.sh as root after pimpmyi3 is finished and you've rebooted.
 
 ***Installed Packages***
@@ -9,7 +11,8 @@ Run i3_config_kali.sh as root after pimpmyi3 is finished and you've rebooted.
 - zaproxy
 - guake 
 - pcmanfm 
-- fish 
+- fish
+- helix
 - terminator 
 - tmux 
 - xsel 

@@ -228,7 +228,7 @@ main() {
     chown -h kali:kali /home/kali/.config/i3/i3status.conf
 
     # Copy new config file.
-    cp /home/kali/Downloads/afterPMi3/i3config.txt /home/kali/.config/i3/config
+    cp /home/kali/Downloads/afterPMi3/config_i3.txt /home/kali/.config/i3/config
     chown kali:kali /home/kali/.config/i3/config
 
     echo "[+] Create some directories."
