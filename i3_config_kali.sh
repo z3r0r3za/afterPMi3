@@ -203,6 +203,9 @@ install_nvm() {
     cd /home/kali
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
     #wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+    cp -r /root/.nvm /home/kali/
+    chown -R kali:kali .nvm/*
+    chown -R kali:kali .nvm/.[^.]*
 }
 
 # Main setup function.
@@ -281,7 +284,7 @@ main() {
     remove_downloads
     install_ohmytmux
     install_fish_config
-    #install_nvm
+    install_nvm
     enable_fish
 
     # /usr/bin/vmhgfs-fuse .host:/kali /home/shared -o subtype=vmhgfs-fuse
