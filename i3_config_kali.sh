@@ -1,10 +1,13 @@
 #!/bin/bash
 
-# i3_config_kali.sh: This will set up the i3 config for kali user and do a few other things. 
-# Scenario: pimpmyi3 has finished, the VM is rebooted and logged in as root.
-# This script assumes that afterPMi3 and the i3config.txt has been downloaded into 
-# /home/kali/Downloads/afterPMi3/i3config.txt
-# It handles the tasks at first boot as root before configuring and switching to kali user.
+# i3_config_kali.sh
+# This will set up the i3 config, some other configs and install packages for the kali user.
+# Install after: pimpmyi3 has finished, the VM has rebooted and logged in as root.
+# This script assumes that afterPMi3 has been downloaded into: /home/kali/Downloads/afterPMi3
+
+# Installed Packages: zaproxy, guake, pcmanfm, fish, vim-gtk3, tmux, xsel, terminator, cmake, 
+# pkg-config,  vivaldi, vscode (if necessary), rustscan, feroxbuster.
+# Configurations: i3, tmux, fish (and enables it), feh, various fonts, backgrounds.
 
 # Paths for go and rust to go in zshrc/bashrc.
 ZSHBASH=$(cat <<-END_TEXT
@@ -118,25 +121,6 @@ install_fonts() {
         ! -name "${EXCLUDED_FILES[1]}" \
     \) -exec cp {} "$TARGET" \;
     done
-    
-    # Copy fonts to target directory.
-    #echo "[+] Moving fonts to target directory."
-    # List of font directories to copy from.
-    #declare -a source_dirs
-    #source_dirs=( "$DESTINATION/FiraCode" "$DESTINATION/Monoid" "$DESTINATION/Hack" )
-    #
-    # Loop through each source directory
-    #for dir in "${source_dirs[@]}";
-    #do
-    #    # List all files in the current directory, excluding LICENCE and README
-    #    ls "$dir" | grep -v "LICENCE|README.md" >| $TEMP_FILES
-    #
-    #    # Copy the files to the target directory
-    #    cp -r "$dir/" "$TARGET/".<$(date +s)
-    #
-    #    # Remove the temp file list after use (optional for cleanup)
-    #    rm $TEMP_FILES
-    #done
 
     echo "[+] Installing Powerline Fonts"
     cd /home/kali/Downloads
@@ -218,22 +202,11 @@ install_ohmytmux() {
     chown kali:kali .tmux.conf.local
 }
 
-#setup_tmux() {
-#  local KUSER="$1"
-#  su "$KUSER" <<'EOF'
-#echo "[+] Installing Oh my tmux"
-#cd /home/kali
-#git clone --single-branch https://github.com/gpakosz/.tmux.git
-#ln -s -f .tmux/.tmux.conf
-##cp .tmux/.tmux.conf.local .
-#cp /home/kali/Downloads/afterPMi3/tmux.conf.txt /home/kali/.tmux.conf.local
-#cd /home/kali
-##echo "$ZSHBASH" >> /home/kali/.bashrc
-##echo "$ZSHBASH" >> /home/kali/.zshrc
-##echo "[+] Using chsh to make fish the permanent shell"
-##echo "[+] Enter kali user's password:"
-#EOF
-#}
+install_nvm() {
+    cd /home/kali
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+    #wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+}
 
 # Main setup function.
 main() {
@@ -291,20 +264,6 @@ main() {
     else
         mv Pictures/. /home/kali/Pictures
     fi
-    # Define source directories
-    #source_dirs=("Backgrounds" "Pictures") 
-    # Define the destination directory
-    #destination_dir="/path/to/destination"
-    # Loop through each source directory
-    #for dir in "${source_dirs[@]}"; do
-    #  # Check if the directory exists in the destination
-    #  if [ ! -d "$destination_dir/$dir" ]; then 
-    #    echo "Moving $dir to $destination_dir..."
-    #    mv "$dir" "$destination_dir/"
-    #  else
-    #    echo "Directory $destination_dir/$dir already exists. Skipping."
-    #  fi
-    #done
 
     # Install starship later if desired.
     #echo "[+] Installing Starship"
@@ -323,6 +282,7 @@ main() {
     remove_downloads
     install_ohmytmux
     install_fish_config
+    #install_nvm
     enable_fish
 
     # /usr/bin/vmhgfs-fuse .host:/kali /home/shared -o subtype=vmhgfs-fuse
