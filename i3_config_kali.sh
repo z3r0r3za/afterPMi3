@@ -22,7 +22,7 @@ END_TEXT
 install_apt() {
     echo "[+] Installing some packages."
     local packages=(
-        zaproxy guake pcmanfm fish vim-gtk3 tmux xsel terminator cmake pkg-config
+        zaproxy guake pcmanfm hx fish vim-gtk3 tmux xsel terminator cmake pkg-config
     )
     apt update && apt -y install "${packages[@]}" || true
 }
