@@ -9,20 +9,25 @@
 # pkg-config,  vivaldi, vscode (if necessary), rustscan, feroxbuster.
 # Configurations: i3, tmux, fish (and enables it), feh, various fonts, backgrounds.
 
-# Paths for go and rust to go in zshrc/bashrc.
+# Paths for go and cargo copied to zshrc/bashrc.
+# The back slashes prevent variables from printing values.
 ZSHBASH=$(cat <<-END_TEXT
-export GOPATH=$HOME/go
-export PATH=$PATH:$GOPATH/bin
-export PATH=$PATH:/usr/local/go/bin
-source "$HOME/.cargo/env"
+# Paths for go and cargo.
+export GOPATH=/home/kali/go
+export PATH=\$PATH:\$GOPATH/bin
+export PATH=\$PATH:/usr/local/go/bin
+source "/home/kali/.cargo/env"
+. "$HOME/.cargo/env"
 END_TEXT
 )
+
+CARGO_INSTALL_ALL="$1"
 
 # Install packages.
 install_apt() {
     echo "[+] Installing some packages."
     local packages=(
-        zaproxy guake pcmanfm hx fish vim-gtk3 tmux xsel terminator cmake pkg-config
+        zaproxy guake pcmanfm fish vim-gtk3 tmux xsel terminator cmake pkg-config
     )
     apt update && apt -y install "${packages[@]}" || true
 }
@@ -138,8 +143,93 @@ install_fonts() {
 }
 
 install_rust_tools() {
-    cargo install rustscan
-    cargo install feroxbuster
+    local ALL="$1"
+    KALI_USER="kali"
+    KALI_HOME="/home/${KALI_USER}"
+    KALI_CARGO_BIN="${KALI_HOME}/.cargo/bin"
+    INSTALL_ALL=false
+
+    # Optional --all flag.
+    if [[ "$ALL" == "--all" ]]; then
+        INSTALL_ALL=true
+        echo "[*] --all: OK, installing all 3 tools."
+    fi
+
+    # Prompt user to install each one if no --all option.
+    ask_install() {
+        local tool="$1"
+
+        if [ "$INSTALL_ALL" = true ]; then
+            return 0
+        fi
+
+        while true; do
+            # Default to Y if Enter pressed.
+            read -p "Continue installing $tool? [Y/n]: " yn
+            yn=${yn:-Y}
+            case $yn in
+                [Yy]* ) return 0 ;;
+                [Nn]* ) return 1 ;;
+                * ) echo "y (yes) or n (no)." ;;
+            esac
+        done
+    }
+
+    # Function to install cargo globally using apt
+    install_cargo_via_apt() {
+        echo "[*] Running apt update and installing cargo."
+        apt update && apt install -y cargo
+    }
+
+    if command -v cargo >/dev/null 2>&1; then
+        echo "[✓] Cargo is installed: $(which cargo)"
+    else
+        echo "[!] 'cargo' not found in /usr/bin PATH."
+        if install_cargo_via_apt; then
+            echo "[+] Installed cargo with apt install."
+        else
+            echo "[-] Cargo isn't and wasn't installed for some reason."
+            echo "[-] You'll need to install the rust tools manually."
+            return 1
+        fi
+    fi
+
+    # Make sure ~/.cargo/bin exists for kali user.
+    sudo -u $KALI_USER mkdir -p "$KALI_CARGO_BIN"
+
+    # Install rustscan, feroxbuster, and ripgrep only if missing.
+    install_tool() {
+        local rust_tool="$1"
+        local install_cmd="$2"
+
+        echo "[*] Checking if $rust_tool is already installed for $KALI_USER..."
+
+        if sudo -u $KALI_USER "$KALI_CARGO_BIN/$rust_tool" --version >/dev/null 2>&1; then
+            echo "[✓] $rust_tool is already installed. Skipping."
+        else
+            echo "[+] Installing $rust_tool for $KALI_USER..."
+            sudo -u $KALI_USER bash -c "$install_cmd"
+        fi
+    }
+
+    # Prompt to install or auto-install if --all option present.
+    if ask_install "RustScan"; then
+        install_tool "rustscan" "cargo install rustscan --root $KALI_HOME/.cargo"
+    fi
+    if ask_install "Feroxbuster"; then
+        install_tool "feroxbuster" "cargo install feroxbuster --root $KALI_HOME/.cargo"
+    fi
+    if ask_install "Ripgrep (rg)"; then
+        install_tool "rg" "cargo install ripgrep --root $KALI_HOME/.cargo"
+    fi
+
+    echo "[*] Verify installed versions:"
+    for tool in rustscan feroxbuster rg; do
+        if [ -x "$KALI_CARGO_BIN/$tool" ]; then
+            echo -n " - $tool: "
+            sudo -u $KALI_USER "$KALI_CARGO_BIN/$tool" -V
+        fi
+    done
 }
 
 # Remove some downloaded files and directories.
@@ -198,11 +288,14 @@ install_ohmytmux() {
     chown kali:kali .tmux.conf.local
 }
 
+install_starship() {
+    curl -sS https://starship.rs/install.sh | sh -s -- -y
+}
+
 install_nvm() {
     echo "[+] Install nvm for kali user."
     cd /home/kali
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-    #wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
     cp -r /root/.nvm /home/kali/
     chown -R kali:kali .nvm/*
     chown -R kali:kali .nvm/.[^.]*
@@ -228,7 +321,7 @@ main() {
     chown -h kali:kali /home/kali/.config/i3/i3status.conf
 
     # Copy new config file.
-    cp /home/kali/Downloads/afterPMi3/config_i3.txt /home/kali/.config/i3/config
+    cp /home/kali/Downloads/afterPMi3/i3config.txt /home/kali/.config/i3/config
     chown kali:kali /home/kali/.config/i3/config
 
     echo "[+] Create some directories."
@@ -254,9 +347,6 @@ main() {
         find Pictures/. -type f -exec chown kali:kali {} \; && \
         chown kali:kali Backgrounds && \
         find Backgrounds/. -type f -exec chown kali:kali {} \;
-        #rm -r /home/kali/Pictures
-        # If pictures exists, just move the files.
-        #mv Pictures /home/kali
 
     if [ ! -d "/home/kali/Backgrounds" ]; then
         mv Backgrounds /home/kali
@@ -267,23 +357,26 @@ main() {
         mv Pictures/. /home/kali/Pictures
     fi
 
+    echo "[+] Copying Go and Cargo paths."
+    echo "$ZSHBASH" >> /home/kali/.bashrc
+    echo "$ZSHBASH" >> /home/kali/.zshrc
+    
     # Install starship later if desired.
     echo "[+] Set up Starship config."
-    #curl -sS https://starship.rs/install.sh -y | sh
-    #curl -sS https://starship.rs/install.sh | sh
-    #sh <(curl -sS https://starship.rs/install.sh) -- -y
     cp /home/kali/Downloads/afterPMi3/starship.toml /home/kali/.config
     chown kali:kali /home/kali/.config/starship.toml
         
     # Install some tools, applications, and clean up.
+    # Uncomment code if necessary or comment out other tools you don't need.
     install_apt
-    #install_rust_tools
+    install_rust_tools "$CARGO_INSTALL_ALL"
     #install_vscode
     install_vivaldi
     install_fonts
     remove_downloads
     install_ohmytmux
     install_fish_config
+    install_starship
     install_nvm
     enable_fish
 

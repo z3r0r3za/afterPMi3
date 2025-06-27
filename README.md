@@ -8,6 +8,9 @@ Run i3_config_kali.sh as root after pimpmyi3 is finished and you've rebooted.
 
 - vivaldi
 - code
+- rustscan
+- feroxbuster
+- ripgrep
 - zaproxy
 - guake 
 - pcmanfm 
