@@ -270,6 +270,7 @@ install_fish_config() {
     fi
     if [ ! -d "$FISHDIR" ]; then
         unzip -q fish.zip -d $CONFDIR || true
+        chown -R kali:kali $FISHDIR
     fi
 }
 
@@ -320,10 +321,14 @@ main() {
     ln -s /etc/i3status.conf /home/kali/.config/i3/i3status.conf
     chown -h kali:kali /home/kali/.config/i3/i3status.conf
 
-    # Copy new config file.
-    cp /home/kali/Downloads/afterPMi3/i3config.txt /home/kali/.config/i3/config
+    # Copy i3 new config file for kali user.
+    cp /home/kali/Downloads/afterPMi3/config_i3.txt /home/kali/.config/i3/config
     chown kali:kali /home/kali/.config/i3/config
 
+    # Copy new i3 config file for root.
+    mv /root/.config/i3/config /root/.config/i3/config_OLD
+    cp /home/kali/Downloads/afterPMi3/config_i3_root.txt /root/.config/i3/config    
+    
     echo "[+] Create some directories."
     # Add extra directories.
     mkdir -p /home/kali/tmux_buffers && chown kali:kali /home/kali/tmux_buffers
@@ -342,6 +347,7 @@ main() {
     cd /home/kali/Downloads/afterPMi3 && \
         cp i3fehbgk /usr/bin && \
         unzip -q Backgrounds.zip && \
+        cp -a Backgrounds /root && \
         unzip -q Pictures.zip && \
         chown kali:kali Pictures && \
         find Pictures/. -type f -exec chown kali:kali {} \; && \
