@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # i3_config_kali.sh
 # This will set up the i3 config, some other configs and install packages for the kali user.
@@ -6,7 +6,7 @@
 # This script assumes that afterPMi3 has been downloaded into: /home/kali/Downloads/afterPMi3
 
 # Installed Packages: zaproxy, guake, pcmanfm, fish, vim-gtk3, tmux, xsel, terminator, cmake, 
-# pkg-config,  vivaldi, vscode (if necessary), rustscan, feroxbuster.
+# pkg-config,  vivaldi, vscode (if necessary), rustscan, feroxbuster, ripgrep, helix.
 # Configurations: i3, tmux, fish (and enables it), feh, various fonts, backgrounds.
 
 # Paths for go and cargo copied to zshrc/bashrc.
@@ -24,13 +24,72 @@ source "/home/kali/.cargo/env"
 END_TEXT
 )
 
-CARGO_INSTALL_ALL="$1"
+exec > >(tee /var/log/afterPMi3.log) 2>&1
+
+# Ensure the script is run as root
+if [[ "$EUID" -ne 0 ]]; then
+    echo "[!] This script must be run as root. Please switch to root and run it again."
+    exit 1
+fi
+
+# Handle --help flag
+if [[ "$1" == "--help" ]]; then
+    cat <<EOF
+
+Usage: ./afterPMi3.sh [--all|--none|--help]
+
+This script configures Kali Linux after running pimpmyi3.sh.
+It installs additional tools, terminals, editors, fonts, i3 configs, and user shells.
+You can choose how Rust-based tools are installed:
+
+  --all     Install rustscan, feroxbuster, and ripgrep without prompting.
+  --none    Skip installation of all Rust tools.
+  
+Note: This script can be run directly as root, or using sudo from a non-root user with full privileges.
+If run with sudo, a password may be required.
+  (no flag) Interactive mode: ask before each Rust tool install.
+
+EOF
+    exit 0
+fi
+
+# Display header and determine Rust tool install mode
+# \e]8;;https://github.com/Dewalt-arch/pimpmyi3\apimpmyi3\e]8;;\a
+clear
+cat <<EOF
+
+##################################################
+#         afterPMi3 - Kali Setup Script          #
+##################################################
+
+This script continues setup after running pimpmyi3.
+https://github.com/Dewalt-arch/pimpmyi3
+
+Choose your Rust tool install mode:
+
+  [1] Install all Rust tools without prompting
+  [2] Skip all Rust tool installs
+  [3] Interactive prompt for each tool
+  [q] Quit
+
+EOF
+
+while true; do
+    read -p "Enter your choice [1/2/3/q]: " rust_choice
+    case "$rust_choice" in
+        1) CARGO_INSTALL_ALL="--all"; break ;;
+        2) CARGO_INSTALL_ALL="--none"; break ;;
+        3|"") CARGO_INSTALL_ALL=""; break ;;
+        [Qq]) echo "Exiting..."; exit 0 ;;
+        *) echo "Invalid input. Please enter 1, 2, 3, or q to quit." ;;
+    esac
+done
 
 # Install packages.
 install_apt() {
     echo "[+] Installing some packages."
     local packages=(
-        zaproxy guake pcmanfm fish vim-gtk3 tmux xsel terminator cmake pkg-config
+        zaproxy guake pcmanfm hx fish vim-gtk3 tmux xsel terminator cmake pkg-config
     )
     apt update && apt -y install "${packages[@]}" || true
 }
