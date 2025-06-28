@@ -12,12 +12,15 @@
 # Paths for go and cargo copied to zshrc/bashrc.
 # The back slashes prevent variables from printing values.
 ZSHBASH=$(cat <<-END_TEXT
+# Created by pipx on 2025-06-28 16:05:52
+export PATH="\$PATH:/home/kali/.local/bin"
+export PATH=\$HOME/.local/bin:\$PATH
 # Paths for go and cargo.
 export GOPATH=/home/kali/go
 export PATH=\$PATH:\$GOPATH/bin
 export PATH=\$PATH:/usr/local/go/bin
 source "/home/kali/.cargo/env"
-. "$HOME/.cargo/env"
+. "\$HOME/.cargo/env"
 END_TEXT
 )
 
