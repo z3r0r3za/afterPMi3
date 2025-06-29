@@ -1,8 +1,8 @@
-This is what I use to finish setting up kali after running [pimpmyi3](https://github.com/Dewalt-arch/pimpmyi3).
+This afterPMi3 script does a little more set up in Kali Linux after running [pimpmyi3](https://github.com/Dewalt-arch/pimpmyi3).
 
-pimpmyi3 will also download and run [pimpmykali](https://github.com/Dewalt-arch/pimpmykali)
+pimpmyi3 also downloads and runs [pimpmykali](https://github.com/Dewalt-arch/pimpmykali). When pimpmyi3 has finished and the VM is rebooted, it will automatically log in as root. Run afterPMi3.sh as root after pimpmyi3 is finished and you've rebooted.
 
-Run i3_config_kali.sh as root after pimpmyi3 is finished and you've rebooted.
+When afterPMi3 is finished and the VM is logged in as the kali user (see steps below), it will have a different i3 config, fish shell with the tide theme (optional starship), oh-my-tmux, nvm (for node), fonts, a different background for each desktop, and more tools.
 
 ***Installed Packages***
 

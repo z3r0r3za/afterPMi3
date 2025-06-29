@@ -24,7 +24,7 @@ source "/home/kali/.cargo/env"
 END_TEXT
 )
 
-exec > >(tee /var/log/afterPMi3.log) 2>&1
+exec > >(tee /home/kali/Downloads/afterPMi3/afterPMi3.log) 2>&1
 
 # Ensure the script is run as root
 if [[ "$EUID" -ne 0 ]]; then
@@ -147,11 +147,12 @@ install_fonts() {
     local TARGET="/home/kali/.local/share/fonts"
     local DESTINATION="/home/kali/Downloads/extra_fonts"
 
-    # Download the zip files.
-    wget -q "$URL1" --directory $DESTINATION || true
-    wget -q "$URL2" --directory $DESTINATION || true
-    wget -q "$URL3" --directory $DESTINATION || true
-
+    # Download all the zip files in the background.
+    wget -q "$URL1" --directory $DESTINATION & || true
+    wget -q "$URL2" --directory $DESTINATION & || true
+    wget -q "$URL3" --directory $DESTINATION & || true
+    wait
+    
     if [[ ! -f "$DESTINATION/FiraCode.zip" && ! -f "$DESTINATION/Monoid.zip" && ! -f "$DESTINATION/Hack.zip" ]]; then
         echo "Failed to download ZIP files. Please check the URLs or network connection."
         exit 1
@@ -300,18 +301,26 @@ remove_downloads() {
     local DOWNLOADS="/home/kali/Downloads"
     FILES=("$DOWNLOADS/code_amd64.deb" "$DOWNLOADS/vivaldi-stable_amd64.deb" "$DOWNLOADS/afterPMi3/Pictures")
     
-    if [ -f "${FILES[0]}" ]; then
-        # If the file exists, delete it
-        rm -rf "${FILES[0]}"
-    fi
-    if [ -f "${FILES[1]}" ]; then
-        # If the file exists, delete it
-        rm -rf "${FILES[1]}"
-    fi
-    if [ -f "${FILES[2]}" ]; then
-        # If the file exists, delete it
-        rm -rf "${FILES[2]}"
-    fi    
+    for file in "${FILES[@]}"; do
+        if [ -f "$file" ]; then
+            rm -rf "$file" 2>/dev/null
+        elif [ -d "$file" ]; then
+            rm -rf "$file" 2>/dev/null
+        fi
+    done    
+    
+    #if [ -f "${FILES[0]}" ]; then
+    #    # If the file exists, delete it
+    #    rm -rf "${FILES[0]}"
+    #fi
+    #if [ -f "${FILES[1]}" ]; then
+    #    # If the file exists, delete it
+    #    rm -rf "${FILES[1]}"
+    #fi
+    #if [ -d "${FILES[2]}" ]; then
+    #    # If the file exists, delete it
+    #    rm -rf "${FILES[2]}"
+    #fi    
     #rm -rf "$DOWNLOADS"/code_amd64.deb "$DOWNLOADS"/vivaldi-stable_amd64.deb "$DOWNLOADS"/afterPMi3/Pictures 2>/dev/null
 }
 
