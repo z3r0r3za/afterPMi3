@@ -85,6 +85,65 @@ while true; do
     esac
 done
 
+# Set up i3 config directory and permissions.
+i3_config() {
+    echo "[+] Setting up i3 config for kali user."
+    mkdir -p /home/kali/.config/i3
+    chown kali:kali /home/kali/.config/i3
+
+    # Create a backup of the original config.
+    cp /root/.config/i3/config /home/kali/.config/i3/config_OLD
+    chown kali:kali /home/kali/.config/i3/config_OLD
+
+    # Create symlinks for i3 utilities.
+    ln -s /usr/bin/i3-alt-tab.py /home/kali/.config/i3/i3-alt-tab.py
+    chown -h kali:kali /home/kali/.config/i3/i3-alt-tab.py
+    ln -s /etc/i3status.conf /home/kali/.config/i3/i3status.conf
+    chown -h kali:kali /home/kali/.config/i3/i3status.conf
+
+    # Copy i3 new config file for kali user.
+    cp /home/kali/Downloads/afterPMi3/config_i3.txt /home/kali/.config/i3/config
+    chown kali:kali /home/kali/.config/i3/config
+
+    # Copy new i3 config file for root.
+    mv /root/.config/i3/config /root/.config/i3/config_OLD
+    cp /home/kali/Downloads/afterPMi3/config_i3_root.txt /root/.config/i3/config
+}
+
+# Add extra directories.
+create_dirs() {
+    echo "[+] Create some directories."
+    mkdir -p /home/kali/tmux_buffers && chown kali:kali /home/kali/tmux_buffers
+    mkdir -p /home/kali/tmux_logs && chown kali:kali /home/kali/tmux_logs
+    mkdir -p /home/kali/Work && chown kali:kali /home/kali/Work
+    mkdir -p /home/kali/Scripts && chown kali:kali /home/kali/Scripts
+    mkdir -p /home/kali/labs && chown kali:kali /home/kali/labs
+    mkdir -p /home/kali/kali && chown kali:kali /home/kali/kali
+}
+
+# Set backgrounds and pictures.
+setup_bg() {
+    echo "[+] Setting up backgrounds."
+    cd /home/kali/Downloads/afterPMi3 && \
+        cp i3fehbgk /usr/bin && \
+        unzip -q Backgrounds.zip && \
+        cp -a Backgrounds /root && \
+        unzip -q Pictures.zip && \
+        chown kali:kali Pictures && \
+        find Pictures/. -type f -exec chown kali:kali {} \; && \
+        chown kali:kali Backgrounds && \
+        find Backgrounds/. -type f -exec chown kali:kali {} \;
+
+    if [ ! -d "/home/kali/Backgrounds" ]; then
+        mv Backgrounds /home/kali
+    fi
+    if [ -d "/home/kali/Pictures" ]; then
+        mv Pictures /home/kali
+    else
+        mv Pictures/. /home/kali/Pictures
+    fi    
+}
+
 # Check and install packages.
 install_apt() {
     echo
@@ -154,72 +213,6 @@ install_vscode() {
             exit 1
         fi
     fi
-}
-
-# Install fonts for kali user.
-install_fonts() {
-    echo
-    echo "[+] Downloading and installing Powerline fonts, Nerd-fonts."
-    mkdir /home/kali/Downloads/extra_fonts && chown kali:kali /home/kali/Downloads/extra_fonts
-    echo "[+] Download and set up of a few more fonts."
-    local URL1="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip"
-    local URL2="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Monoid.zip"
-    local URL3="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Hack.zip"
-    local TARGET="/home/kali/.local/share/fonts"
-    local DESTINATION="/home/kali/Downloads/extra_fonts"
-
-    # Download all the zip files in the background.
-    wget -q "$URL1" --directory $DESTINATION &
-    wget -q "$URL2" --directory $DESTINATION &
-    wget -q "$URL3" --directory $DESTINATION &
-    wait
-    
-    if [[ ! -f "$DESTINATION/FiraCode.zip" && ! -f "$DESTINATION/Monoid.zip" && ! -f "$DESTINATION/Hack.zip" ]]; then
-        echo "Failed to download ZIP files. Please check the URLs or network connection."
-        exit 1
-    fi
-
-    # Set ownership.
-    chown -R kali:kali $DESTINATION
-
-    # Unzip the files to target.
-    unzip -q $DESTINATION/FiraCode.zip -d $DESTINATION/FiraCode || true
-    unzip -q $DESTINATION/Monoid.zip -d $DESTINATION/Monoid || true
-    unzip -q $DESTINATION/Hack.zip -d $DESTINATION/Hack || true
-
-    # Copy fonts to target directory.
-    FONT_SOURCED=("$DESTINATION/FiraCode" "$DESTINATION/Monoid" "$DESTINATION/Hack")
-
-    # Font target directory.
-    FONT_DESTD="/home/kali/.local/share/fonts"
-    if [ ! -d "$FONT_DESTD" ]; then
-        mkdir $FONT_DESTD
-        chown kali:kali $FONT_DESTD
-    fi
-    
-    # Excluded filenames from font directory
-    EXCLUDED_FILES=("LICENSE" "README.md")
-
-    # Loop through each source directory
-    for dir in "${FONT_SOURCED[@]}"; do
-        find "$dir" -type f \( \
-            ! -name "${EXCLUDED_FILES[0]}" -a \
-            ! -name "${EXCLUDED_FILES[1]}" \
-        \) -exec cp {} "$TARGET" \;
-    done
-
-    echo "[+] Installing Powerline fonts"
-    cd /home/kali/Downloads
-    git clone https://github.com/powerline/fonts.git
-    cd fonts
-    ./install.sh
-    cp -r /root/.local/share/fonts/. $TARGET
-    find $TARGET -type d -exec chown kali:kali {} \;
-    find $TARGET/. -type f -exec chown -R kali:kali {} \;
-    cd /home/kali/Downloads
-    
-    # Reload font cache.
-    fc-cache -f /home/kali/.local/share/fonts
 }
 
 install_rust_tools() {
@@ -317,6 +310,128 @@ install_rust_tools() {
     echo "$ZSHBASH" >> /home/kali/.zshrc    
 }
 
+# Install fonts for kali user.
+install_fonts() {
+    echo
+    echo "[+] Downloading and installing Powerline fonts, Nerd-fonts."
+    mkdir /home/kali/Downloads/extra_fonts && chown kali:kali /home/kali/Downloads/extra_fonts
+    echo "[+] Download and set up of a few more fonts."
+    local URL1="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip"
+    local URL2="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Monoid.zip"
+    local URL3="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/Hack.zip"
+    local TARGET="/home/kali/.local/share/fonts"
+    local DESTINATION="/home/kali/Downloads/extra_fonts"
+
+    # Download all the zip files in the background.
+    wget -q "$URL1" --directory $DESTINATION || true
+    wget -q "$URL2" --directory $DESTINATION || true
+    wget -q "$URL3" --directory $DESTINATION || true
+    
+    if [[ ! -f "$DESTINATION/FiraCode.zip" && ! -f "$DESTINATION/Monoid.zip" && ! -f "$DESTINATION/Hack.zip" ]]; then
+        echo "Failed to download ZIP files. Please check the URLs or network connection."
+        exit 1
+    fi
+
+    # Set ownership.
+    chown -R kali:kali $DESTINATION
+
+    # Unzip the files to target.
+    unzip -q $DESTINATION/FiraCode.zip -d $DESTINATION/FiraCode || true
+    unzip -q $DESTINATION/Monoid.zip -d $DESTINATION/Monoid || true
+    unzip -q $DESTINATION/Hack.zip -d $DESTINATION/Hack || true
+
+    # Copy fonts to target directory.
+    FONT_SOURCED=("$DESTINATION/FiraCode" "$DESTINATION/Monoid" "$DESTINATION/Hack")
+
+    # Font target directory.
+    FONT_DESTD="/home/kali/.local/share/fonts"
+    if [ ! -d "$FONT_DESTD" ]; then
+        mkdir $FONT_DESTD
+        chown kali:kali $FONT_DESTD
+    fi
+    
+    # Excluded filenames from font directory
+    EXCLUDED_FILES=("LICENSE" "README.md")
+
+    # Loop through each source directory
+    for dir in "${FONT_SOURCED[@]}"; do
+        find "$dir" -type f \( \
+            ! -name "${EXCLUDED_FILES[0]}" -a \
+            ! -name "${EXCLUDED_FILES[1]}" \
+        \) -exec cp {} "$TARGET" \;
+    done
+
+    echo "[+] Installing Powerline fonts"
+    cd /home/kali/Downloads
+    git clone https://github.com/powerline/fonts.git
+    cd fonts
+    ./install.sh
+    cp -r /root/.local/share/fonts/. $TARGET
+    find $TARGET -type d -exec chown kali:kali {} \;
+    find $TARGET/. -type f -exec chown -R kali:kali {} \;
+    cd /home/kali/Downloads
+    echo "[+] Powerline fonts copied to kali user's home."
+    
+    # Reload font cache.
+    fc-cache -f /home/kali/.local/share/fonts
+}
+
+# Install and set up oh-my-tmux for kali user.
+install_ohmytmux() {
+    echo "[+] Installing Oh-my-tmux"
+    cd /home/kali
+    git clone --single-branch https://github.com/gpakosz/.tmux.git
+    chown kali:kali .tmux
+    chown -R kali:kali .tmux/*
+    chown -R kali:kali .tmux/.[^.]*
+    ln -s -f .tmux/.tmux.conf
+    chown -h kali:kali .tmux.conf
+    # Commenting this line because the config already exists.
+    #cp .tmux/.tmux.conf.local .
+    cp /home/kali/Downloads/afterPMi3/tmux.conf.txt /home/kali/.tmux.conf.local
+    chown kali:kali .tmux.conf.local
+}
+
+# Set up fish config for kali user.
+install_fish_config() {
+    echo "[+] Set up fish config for kali user."
+    cd /home/kali/Downloads/afterPMi3/
+    local FISHDIR="/home/kali/.config/fish"
+    local CONFDIR="/home/kali/.config"
+    if [ -d "$FISHDIR" ]; then
+        rm -rf $FISHDIR
+        unzip -q fish.zip -d $CONFDIR || true
+    fi
+    if [ ! -d "$FISHDIR" ]; then
+        unzip -q fish.zip -d $CONFDIR || true
+        chown -R kali:kali $FISHDIR
+    fi
+}
+
+# Install and setup starfish for kali user.
+install_starship() {
+    curl -sS https://starship.rs/install.sh | sh -s -- -y
+    echo "[+] Set up Starship config."
+    cp /home/kali/Downloads/afterPMi3/starship.toml /home/kali/.config
+    chown kali:kali /home/kali/.config/starship.toml   
+}
+
+# Install nvm for kali user.
+install_nvm() {
+    echo "[+] Install nvm for kali user."
+    cd /home/kali
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+    cp -r /root/.nvm /home/kali/
+    chown -R kali:kali .nvm/*
+    chown -R kali:kali .nvm/.[^.]*
+}
+
+enable_fish() {
+    # Run as root
+    echo "[+] Permanently enable fish for kali user."
+    chsh -s /usr/bin/fish kali
+}
+
 # Remove some downloaded files and directories.
 remove_downloads() {
     echo
@@ -361,131 +476,19 @@ remove_downloads() {
     #rm -rf "$DOWNLOADS"/code_amd64.deb "$DOWNLOADS"/vivaldi-stable_amd64.deb "$DOWNLOADS"/afterPMi3/Pictures 2>/dev/null
 }
 
-enable_fish() {
-    # Run as root
-    echo "[+] Permanently enable fish for kali user."
-    chsh -s /usr/bin/fish kali
-}
-
-install_fish_config() {
-    echo "[+] Set up fish config for kali user."
-    cd /home/kali/Downloads/afterPMi3/
-    local FISHDIR="/home/kali/.config/fish"
-    local CONFDIR="/home/kali/.config"
-    if [ -d "$FISHDIR" ]; then
-        rm -rf $FISHDIR
-        unzip -q fish.zip -d $CONFDIR || true
-    fi
-    if [ ! -d "$FISHDIR" ]; then
-        unzip -q fish.zip -d $CONFDIR || true
-        chown -R kali:kali $FISHDIR
-    fi
-}
-
-install_ohmytmux() {
-    echo "[+] Installing Oh-my-tmux"
-    cd /home/kali
-    git clone --single-branch https://github.com/gpakosz/.tmux.git
-    chown kali:kali .tmux
-    chown -R kali:kali .tmux/*
-    chown -R kali:kali .tmux/.[^.]*
-    ln -s -f .tmux/.tmux.conf
-    chown -h kali:kali .tmux.conf
-    # Commenting this line because the config already exists.
-    #cp .tmux/.tmux.conf.local .
-    cp /home/kali/Downloads/afterPMi3/tmux.conf.txt /home/kali/.tmux.conf.local
-    chown kali:kali .tmux.conf.local
-}
-
-install_starship() {
-    curl -sS https://starship.rs/install.sh | sh -s -- -y
-    echo "[+] Set up Starship config."
-    cp /home/kali/Downloads/afterPMi3/starship.toml /home/kali/.config
-    chown kali:kali /home/kali/.config/starship.toml   
-}
-
-install_nvm() {
-    echo "[+] Install nvm for kali user."
-    cd /home/kali
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-    cp -r /root/.nvm /home/kali/
-    chown -R kali:kali .nvm/*
-    chown -R kali:kali .nvm/.[^.]*
-}
-
-i3_config() {
-    echo "[+] Setting up i3 config for kali user."
-    # Set up i3 config directory and permissions.
-    mkdir -p /home/kali/.config/i3
-    chown kali:kali /home/kali/.config/i3
-
-    # Create a backup of the original config.
-    cp /root/.config/i3/config /home/kali/.config/i3/config_OLD
-    chown kali:kali /home/kali/.config/i3/config_OLD
-
-    # Create symlinks for i3 utilities.
-    ln -s /usr/bin/i3-alt-tab.py /home/kali/.config/i3/i3-alt-tab.py
-    chown -h kali:kali /home/kali/.config/i3/i3-alt-tab.py
-    ln -s /etc/i3status.conf /home/kali/.config/i3/i3status.conf
-    chown -h kali:kali /home/kali/.config/i3/i3status.conf
-
-    # Copy i3 new config file for kali user.
-    cp /home/kali/Downloads/afterPMi3/config_i3.txt /home/kali/.config/i3/config
-    chown kali:kali /home/kali/.config/i3/config
-
-    # Copy new i3 config file for root.
-    mv /root/.config/i3/config /root/.config/i3/config_OLD
-    cp /home/kali/Downloads/afterPMi3/config_i3_root.txt /root/.config/i3/config
-}
-
-create_dirs() {
-    echo "[+] Create some directories."
-    # Add extra directories.
-    mkdir -p /home/kali/tmux_buffers && chown kali:kali /home/kali/tmux_buffers
-    mkdir -p /home/kali/tmux_logs && chown kali:kali /home/kali/tmux_logs
-    mkdir -p /home/kali/Work && chown kali:kali /home/kali/Work
-    mkdir -p /home/kali/Scripts && chown kali:kali /home/kali/Scripts
-    mkdir -p /home/kali/labs && chown kali:kali /home/kali/labs
-    mkdir -p /home/kali/kali && chown kali:kali /home/kali/kali
-}
-
-setup_bg() {
-    # Set backgrounds and pictures
-    echo "[+] Setting up backgrounds."
-    cd /home/kali/Downloads/afterPMi3 && \
-        cp i3fehbgk /usr/bin && \
-        unzip -q Backgrounds.zip && \
-        cp -a Backgrounds /root && \
-        unzip -q Pictures.zip && \
-        chown kali:kali Pictures && \
-        find Pictures/. -type f -exec chown kali:kali {} \; && \
-        chown kali:kali Backgrounds && \
-        find Backgrounds/. -type f -exec chown kali:kali {} \;
-
-    if [ ! -d "/home/kali/Backgrounds" ]; then
-        mv Backgrounds /home/kali
-    fi
-    if [ -d "/home/kali/Pictures" ]; then
-        mv Pictures /home/kali
-    else
-        mv Pictures/. /home/kali/Pictures
-    fi    
-}
-
 # Main setup function.
 main() {
     echo "[+] Starting first boot as root setup for i3 kali user."
     echo
-
     # Install some tools, applications, and clean up.
     # Uncomment code if necessary or comment out other tools you don't need.
     i3_config
     create_dirs
     setup_bg
     install_apt
+    install_vivaldi    
+    install_vscode    
     install_rust_tools "$CARGO_INSTALL_ALL"
-    install_vscode
-    install_vivaldi
     install_fonts
     install_ohmytmux
     install_fish_config
