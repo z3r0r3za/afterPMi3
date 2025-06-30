@@ -159,7 +159,7 @@ install_vscode() {
 # Install fonts for kali user.
 install_fonts() {
     echo
-    echo "[+] Installing Powerline fonts, Nerd-fonts."
+    echo "[+] Downloading and installing Powerline fonts, Nerd-fonts."
     mkdir /home/kali/Downloads/extra_fonts && chown kali:kali /home/kali/Downloads/extra_fonts
     echo "[+] Download and set up of a few more fonts."
     local URL1="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip"
@@ -169,9 +169,9 @@ install_fonts() {
     local DESTINATION="/home/kali/Downloads/extra_fonts"
 
     # Download all the zip files in the background.
-    wget -q "$URL1" --directory $DESTINATION & || true
-    wget -q "$URL2" --directory $DESTINATION & || true
-    wget -q "$URL3" --directory $DESTINATION & || true
+    wget -q "$URL1" --directory $DESTINATION &
+    wget -q "$URL2" --directory $DESTINATION &
+    wget -q "$URL3" --directory $DESTINATION &
     wait
     
     if [[ ! -f "$DESTINATION/FiraCode.zip" && ! -f "$DESTINATION/Monoid.zip" && ! -f "$DESTINATION/Hack.zip" ]]; then
