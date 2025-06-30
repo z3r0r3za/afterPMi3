@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-# i3_config_kali.sh
-# This will set up the i3 config, some other configs and install packages for the kali user.
-# Install after: pimpmyi3 has finished, the VM has rebooted and logged in as root.
-# This script assumes that afterPMi3 has been downloaded into: /home/kali/Downloads/afterPMi3
-
-# Installed Packages: zaproxy, guake, pcmanfm, fish, vim-gtk3, tmux, xsel, terminator, cmake, 
-# pkg-config,  vivaldi, vscode (if necessary), rustscan, feroxbuster, ripgrep, helix.
+# afterPMi3.sh: This will set up the i3 config, some other configs and install packages for the kali user.
+# Use this script: after pimpmyi3 has finished, the VM has rebooted and is logged in as root.
+# This script assumes that afterPMi3 has been cloned or downloaded into: /home/kali/Downloads/afterPMi3
+#
+# Installed Packages: zaproxy, guake, pcmanfm, helix, fish, vim-gtk3, tmux, xsel, terminator, cmake, 
+# pkg-config, vivaldi, (vs)code (if necessary), rustscan, feroxbuster, ripgrep.
+#
 # Configurations: i3, tmux, fish (and enables it), feh, various fonts, backgrounds.
 
 # Paths for go and cargo copied to zshrc/bashrc.
@@ -28,7 +28,7 @@ exec > >(tee /home/kali/Downloads/afterPMi3/afterPMi3.log) 2>&1
 
 # Ensure the script is run as root
 if [[ "$EUID" -ne 0 ]]; then
-    echo "[!] This script must be run as root. Please switch to root and run it again."
+    echo "[!] This script was meant to be run as root. Please switch to root and run it again."
     exit 1
 fi
 
@@ -38,16 +38,16 @@ if [[ "$1" == "--help" ]]; then
 
 Usage: ./afterPMi3.sh [--all|--none|--help]
 
-This script configures Kali Linux after running pimpmyi3.sh.
+This script configures Kali Linux for the kali user after running pimpmyi3.sh.
 It installs additional tools, terminals, editors, fonts, i3 configs, and user shells.
 You can choose how Rust-based tools are installed:
 
   --all     Install rustscan, feroxbuster, and ripgrep without prompting.
   --none    Skip installation of all Rust tools.
-  
-Note: This script can be run directly as root, or using sudo from a non-root user with full privileges.
-If run with sudo, a password may be required.
   (no flag) Interactive mode: ask before each Rust tool install.
+  
+Note: This script was written to be run directly as root, but using sudo from a non-root user with full privileges
+may work. It just hasn't been tested. If it's run with sudo, a password may be required.
 
 EOF
     exit 0
@@ -59,7 +59,7 @@ clear
 cat <<EOF
 
 ##################################################
-#         afterPMi3 - Kali Setup Script          #
+##        afterPMi3 - Kali Setup Script         ##
 ##################################################
 
 This script continues setup after running pimpmyi3.
@@ -85,24 +85,42 @@ while true; do
     esac
 done
 
-# Install packages.
+# Check and install packages.
 install_apt() {
-    echo "[+] Installing some packages."
+    echo
+    echo "[+] Checking and installing some missing packages."
     local packages=(
-        zaproxy guake pcmanfm hx fish vim-gtk3 tmux xsel terminator cmake pkg-config
+        zaproxy guake pcmanfm hx fish tmux xsel terminator cmake pkg-config
     )
-    apt update && apt -y install "${packages[@]}" || true
+    # Array to hold packages that are not installed
+    local -a to_install=()
+    
+    # Check which packages might exist.
+    for pkg in "${packages[@]}"; do
+        if ! command -v "$pkg" &> /dev/null; then
+            to_install+=("$pkg")
+        fi
+    done
+    
+    # Install only the missing packages.
+    if [ ${#to_install[@]} -gt 0 ]; then
+        apt update && apt -y install "${to_install[@]}" || true
+    else
+        echo "[-] All required packages are already installed."
+    fi
 }
 
-# Install Vivaldi browser.
+# Install Vivaldi browser if it isn't.
 install_vivaldi() {
+    echo
     echo "[+] Installing Vivaldi."
     local VIVALDI_URL="https://vivaldi.com/download/vivaldi-stable_amd64.deb"
     local VIVA="/home/kali/Downloads/vivaldi-stable_amd64.deb"
 
-    if [[ -f "$VIVA" ]]; then
-        dpkg -i $VIVA 2>/dev/null || true
-        echo "Already installed or downloaded."
+    # Check if vivaldi is installed.
+    if command -v vivaldi >/dev/null 2>&1; then
+        echo "[+] Vivaldi is already installed."
+        return 0
     else
         wget -qO $VIVA "$VIVALDI_URL"
         if [[ -f "$VIVA" ]]; then
@@ -115,22 +133,24 @@ install_vivaldi() {
     fi
 }
 
-# Install VS Code.
+# Install VS Code if it isn't.
 install_vscode() {
-    echo "[+] Installing Code."
+    echo
+    echo "[+] Installing VS Code."
     local CODE_URL="https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
     local CODE="/home/kali/Downloads/code_amd64.deb"
 
-    if [[ -f "$CODE" ]]; then
-        dpkg -i $CODE 2>/dev/null || true
-        echo "VS Code already installed."
+    # Check if code is installed.
+    if command -v code >/dev/null 2>&1; then
+        echo "[+] Code is already installed."
+        return 0
     else
         wget -qO $CODE "$CODE_URL"
         if [[ -f "$CODE" ]]; then
             dpkg -i $CODE 2>/dev/null || true
-            echo "Downloaded and installed VS Code."
+            echo "[+] Downloaded and installed VS Code."
         else
-            echo "Failed to download VS Code. Please check or try again later."
+            echo "[-] Failed to download VS Code. Please check or try again later."
             exit 1
         fi
     fi
@@ -138,7 +158,8 @@ install_vscode() {
 
 # Install fonts for kali user.
 install_fonts() {
-    echo "[+] Installing some Nerd-fonts."
+    echo
+    echo "[+] Installing Powerline fonts, Nerd-fonts."
     mkdir /home/kali/Downloads/extra_fonts && chown kali:kali /home/kali/Downloads/extra_fonts
     echo "[+] Download and set up of a few more fonts."
     local URL1="https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip"
@@ -181,10 +202,10 @@ install_fonts() {
 
     # Loop through each source directory
     for dir in "${FONT_SOURCED[@]}"; do
-    find "$dir" -type f \( \
-        ! -name "${EXCLUDED_FILES[0]}" -a \
-        ! -name "${EXCLUDED_FILES[1]}" \
-    \) -exec cp {} "$TARGET" \;
+        find "$dir" -type f \( \
+            ! -name "${EXCLUDED_FILES[0]}" -a \
+            ! -name "${EXCLUDED_FILES[1]}" \
+        \) -exec cp {} "$TARGET" \;
     done
 
     echo "[+] Installing Powerline fonts"
@@ -199,13 +220,10 @@ install_fonts() {
     
     # Reload font cache.
     fc-cache -f /home/kali/.local/share/fonts
-
-    # Remove font directories after they are installed.
-    rm -rf $DESTINATION/{FiraCode,Monoid,Hack}
-    rm -rf /home/kali/Downloads/fonts
 }
 
 install_rust_tools() {
+    echo
     local ALL="$1"
     KALI_USER="kali"
     KALI_HOME="/home/${KALI_USER}"
@@ -215,7 +233,7 @@ install_rust_tools() {
     # Optional --all flag.
     if [[ "$ALL" == "--all" ]]; then
         INSTALL_ALL=true
-        echo "[*] --all: OK, installing all 3 tools."
+        echo "[*] --all: OK, installing all 3 rust tools."
     fi
 
     # Prompt user to install each one if no --all option.
@@ -293,13 +311,25 @@ install_rust_tools() {
             sudo -u $KALI_USER "$KALI_CARGO_BIN/$tool" -V
         fi
     done
+
+    echo "[+] Copying Go and Cargo paths to bashrc/zsh."
+    echo "$ZSHBASH" >> /home/kali/.bashrc
+    echo "$ZSHBASH" >> /home/kali/.zshrc    
 }
 
 # Remove some downloaded files and directories.
 remove_downloads() {
-    echo "[+] Removing some temporary files and downloads."
+    echo
+    echo "[+] Removing some downloaded files."
+    local NERDFONTS="/home/kali/Downloads/extra_fonts"
     local DOWNLOADS="/home/kali/Downloads"
-    FILES=("$DOWNLOADS/code_amd64.deb" "$DOWNLOADS/vivaldi-stable_amd64.deb" "$DOWNLOADS/afterPMi3/Pictures")
+    
+    FILES=(
+        "$DOWNLOADS/code_amd64.deb" 
+        "$DOWNLOADS/vivaldi-stable_amd64.deb" 
+        "$DOWNLOADS/afterPMi3/Pictures"
+        "$DOWNLOADS/fonts"
+    )
     
     for file in "${FILES[@]}"; do
         if [ -f "$file" ]; then
@@ -309,6 +339,13 @@ remove_downloads() {
         fi
     done    
     
+    # Remove other nerd-font directories after they are installed.
+    rm -rf $NERDFONTS/{FiraCode,Monoid,Hack}
+
+    # Confirm ownership of remaining Downloads for kali user.
+    find /home/kali/Downloads -type d -exec chown kali:kali {} \;
+    find /home/kali/Downloads -type f -exec chown kali:kali {} \;
+
     #if [ -f "${FILES[0]}" ]; then
     #    # If the file exists, delete it
     #    rm -rf "${FILES[0]}"
@@ -362,6 +399,9 @@ install_ohmytmux() {
 
 install_starship() {
     curl -sS https://starship.rs/install.sh | sh -s -- -y
+    echo "[+] Set up Starship config."
+    cp /home/kali/Downloads/afterPMi3/starship.toml /home/kali/.config
+    chown kali:kali /home/kali/.config/starship.toml   
 }
 
 install_nvm() {
@@ -373,11 +413,8 @@ install_nvm() {
     chown -R kali:kali .nvm/.[^.]*
 }
 
-# Main setup function.
-main() {
-    echo "[+] Starting first boot as root setup for i3 kali user."
-
-    echo "[+] Set up i3 config."
+i3_config() {
+    echo "[+] Setting up i3 config for kali user."
     # Set up i3 config directory and permissions.
     mkdir -p /home/kali/.config/i3
     chown kali:kali /home/kali/.config/i3
@@ -398,8 +435,10 @@ main() {
 
     # Copy new i3 config file for root.
     mv /root/.config/i3/config /root/.config/i3/config_OLD
-    cp /home/kali/Downloads/afterPMi3/config_i3_root.txt /root/.config/i3/config    
-    
+    cp /home/kali/Downloads/afterPMi3/config_i3_root.txt /root/.config/i3/config
+}
+
+create_dirs() {
     echo "[+] Create some directories."
     # Add extra directories.
     mkdir -p /home/kali/tmux_buffers && chown kali:kali /home/kali/tmux_buffers
@@ -408,11 +447,9 @@ main() {
     mkdir -p /home/kali/Scripts && chown kali:kali /home/kali/Scripts
     mkdir -p /home/kali/labs && chown kali:kali /home/kali/labs
     mkdir -p /home/kali/kali && chown kali:kali /home/kali/kali
+}
 
-    # Set owner for kali user.
-    find /home/kali/Downloads -type d -exec chown kali:kali {} \;
-    find /home/kali/Downloads -type f -exec chown kali:kali {} \;
-
+setup_bg() {
     # Set backgrounds and pictures
     echo "[+] Setting up backgrounds."
     cd /home/kali/Downloads/afterPMi3 && \
@@ -432,33 +469,36 @@ main() {
         mv Pictures /home/kali
     else
         mv Pictures/. /home/kali/Pictures
-    fi
+    fi    
+}
 
-    echo "[+] Copying Go and Cargo paths."
-    echo "$ZSHBASH" >> /home/kali/.bashrc
-    echo "$ZSHBASH" >> /home/kali/.zshrc
-    
-    # Install starship later if desired.
-    echo "[+] Set up Starship config."
-    cp /home/kali/Downloads/afterPMi3/starship.toml /home/kali/.config
-    chown kali:kali /home/kali/.config/starship.toml
-        
+# Main setup function.
+main() {
+    echo "[+] Starting first boot as root setup for i3 kali user."
+    echo
+
     # Install some tools, applications, and clean up.
     # Uncomment code if necessary or comment out other tools you don't need.
+    i3_config
+    create_dirs
+    setup_bg
     install_apt
     install_rust_tools "$CARGO_INSTALL_ALL"
-    #install_vscode
+    install_vscode
     install_vivaldi
     install_fonts
-    remove_downloads
     install_ohmytmux
     install_fish_config
     install_starship
     install_nvm
     enable_fish
+    remove_downloads
 
     # /usr/bin/vmhgfs-fuse .host:/kali /home/shared -o subtype=vmhgfs-fuse
+    echo
+    echo "[+] afterPMi3 setup is finished."
     echo "[+] Reboot or login as kali user to apply changes."
+    echo "[+] These key commands will change for kali user:"
     echo "[+] To reboot press Alt-Shift-E, then press r."
     echo "[+] To log in press Alt-Shift-E, then press e."
     echo "[+] In the top right menu, select i3 and log in as kali."
