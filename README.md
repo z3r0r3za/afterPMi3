@@ -10,16 +10,15 @@ When afterPMi3 is finished and the VM is logged in as the kali user (see steps b
 - code
 - rustscan
 - feroxbuster
-- ripgrep
+- rg (ripgrep)
 - zaproxy
 - guake 
 - pcmanfm 
 - fish
-- helix
+- hx (helix)
 - terminator 
 - tmux 
 - xsel 
-- vim-gtk3
 - and a couple others
 
 ***Other installs, configs, etc.***
