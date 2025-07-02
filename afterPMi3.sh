@@ -75,13 +75,14 @@ Choose your Rust tool install mode:
 EOF
 
 while true; do
-    read -p "Enter your choice [1/2/3/q]: " rust_choice
+    read -p "Enter your choice [1/2/3/4/q]: " rust_choice
     case "$rust_choice" in
         1) CARGO_INSTALL_ALL="--all"; break ;;
         2) CARGO_INSTALL_ALL="--none"; break ;;
         3|"") CARGO_INSTALL_ALL=""; break ;;
+        4) ONLY_RUST=true; break ;;
         [Qq]) echo "Exiting..."; exit 0 ;;
-        *) echo "Invalid input. Please enter 1, 2, 3, or q to quit." ;;
+        *) echo "Invalid input. Please enter 1, 2, 3, 4, or q to quit." ;;
     esac
 done
 
@@ -149,7 +150,7 @@ install_apt() {
     echo
     echo "[+] Checking and installing some missing packages."
     local packages=(
-        zaproxy guake pcmanfm hx fish tmux xsel terminator cmake pkg-config
+        zaproxy guake pcmanfm hx fish tmux xsel terminator oscanner redis-tools sipvicious tnscmd10g cmake pkg-config
     )
     # Array to hold packages that are not installed
     local -a to_install=()
@@ -167,147 +168,6 @@ install_apt() {
     else
         echo "[-] All required packages are already installed."
     fi
-}
-
-# Install Vivaldi browser if it isn't.
-install_vivaldi() {
-    echo
-    echo "[+] Installing Vivaldi."
-    local VIVALDI_URL="https://vivaldi.com/download/vivaldi-stable_amd64.deb"
-    local VIVA="/home/kali/Downloads/vivaldi-stable_amd64.deb"
-
-    # Check if vivaldi is installed.
-    if command -v vivaldi >/dev/null 2>&1; then
-        echo "[+] Vivaldi is already installed."
-        return 0
-    else
-        wget -qO $VIVA "$VIVALDI_URL"
-        if [[ -f "$VIVA" ]]; then
-            dpkg -i $VIVA 2>/dev/null || true
-            echo "Downloaded and installed Vivaldi."
-        else
-            echo "Failed to download Vivaldi. Please check or try again later."
-            exit 1
-        fi
-    fi
-}
-
-# Install VS Code if it isn't.
-install_vscode() {
-    echo
-    echo "[+] Installing VS Code."
-    local CODE_URL="https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
-    local CODE="/home/kali/Downloads/code_amd64.deb"
-
-    # Check if code is installed.
-    if command -v code >/dev/null 2>&1; then
-        echo "[+] Code is already installed."
-        return 0
-    else
-        wget -qO $CODE "$CODE_URL"
-        if [[ -f "$CODE" ]]; then
-            dpkg -i $CODE 2>/dev/null || true
-            echo "[+] Downloaded and installed VS Code."
-        else
-            echo "[-] Failed to download VS Code. Please check or try again later."
-            exit 1
-        fi
-    fi
-}
-
-install_rust_tools() {
-    echo
-    local ALL="$1"
-    KALI_USER="kali"
-    KALI_HOME="/home/${KALI_USER}"
-    KALI_CARGO_BIN="${KALI_HOME}/.cargo/bin"
-    INSTALL_ALL=false
-
-    # Optional --all flag.
-    if [[ "$ALL" == "--all" ]]; then
-        INSTALL_ALL=true
-        echo "[*] --all: OK, installing all 3 rust tools."
-    fi
-
-    # Prompt user to install each one if no --all option.
-    ask_install() {
-        local tool="$1"
-
-        if [ "$INSTALL_ALL" = true ]; then
-            return 0
-        fi
-
-        while true; do
-            # Default to Y if Enter pressed.
-            read -p "Continue installing $tool? [Y/n]: " yn
-            yn=${yn:-Y}
-            case $yn in
-                [Yy]* ) return 0 ;;
-                [Nn]* ) return 1 ;;
-                * ) echo "y (yes) or n (no)." ;;
-            esac
-        done
-    }
-
-    # Function to install cargo globally using apt
-    install_cargo_via_apt() {
-        echo "[*] Running apt update and installing cargo."
-        apt update && apt install -y cargo
-    }
-
-    if command -v cargo >/dev/null 2>&1; then
-        echo "[✓] Cargo is installed: $(which cargo)"
-    else
-        echo "[!] 'cargo' not found in /usr/bin PATH."
-        if install_cargo_via_apt; then
-            echo "[+] Installed cargo with apt install."
-        else
-            echo "[-] Cargo isn't and wasn't installed for some reason."
-            echo "[-] You'll need to install the rust tools manually."
-            return 1
-        fi
-    fi
-
-    # Make sure ~/.cargo/bin exists for kali user.
-    sudo -u $KALI_USER mkdir -p "$KALI_CARGO_BIN"
-
-    # Install rustscan, feroxbuster, and ripgrep only if missing.
-    install_tool() {
-        local rust_tool="$1"
-        local install_cmd="$2"
-
-        echo "[*] Checking if $rust_tool is already installed for $KALI_USER..."
-
-        if sudo -u $KALI_USER "$KALI_CARGO_BIN/$rust_tool" --version >/dev/null 2>&1; then
-            echo "[✓] $rust_tool is already installed. Skipping."
-        else
-            echo "[+] Installing $rust_tool for $KALI_USER..."
-            sudo -u $KALI_USER bash -c "$install_cmd"
-        fi
-    }
-
-    # Prompt to install or auto-install if --all option present.
-    if ask_install "RustScan"; then
-        install_tool "rustscan" "cargo install rustscan --root $KALI_HOME/.cargo"
-    fi
-    if ask_install "Feroxbuster"; then
-        install_tool "feroxbuster" "cargo install feroxbuster --root $KALI_HOME/.cargo"
-    fi
-    if ask_install "Ripgrep (rg)"; then
-        install_tool "rg" "cargo install ripgrep --root $KALI_HOME/.cargo"
-    fi
-
-    echo "[*] Verify installed versions:"
-    for tool in rustscan feroxbuster rg; do
-        if [ -x "$KALI_CARGO_BIN/$tool" ]; then
-            echo -n " - $tool: "
-            sudo -u $KALI_USER "$KALI_CARGO_BIN/$tool" -V
-        fi
-    done
-
-    echo "[+] Copying Go and Cargo paths to bashrc/zsh."
-    echo "$ZSHBASH" >> /home/kali/.bashrc
-    echo "$ZSHBASH" >> /home/kali/.zshrc    
 }
 
 # Install fonts for kali user.
@@ -426,6 +286,154 @@ install_nvm() {
     chown -R kali:kali .nvm/.[^.]*
 }
 
+install_autorecon() {
+    sudo -u kali bash -c pipx install git+https://github.com/Tib3rius/AutoRecon.git
+}
+
+# Install Vivaldi browser if it isn't.
+install_vivaldi() {
+    echo
+    echo "[+] Installing Vivaldi."
+    local VIVALDI_URL="https://vivaldi.com/download/vivaldi-stable_amd64.deb"
+    local VIVA="/home/kali/Downloads/vivaldi-stable_amd64.deb"
+
+    # Check if vivaldi is installed.
+    if command -v vivaldi >/dev/null 2>&1; then
+        echo "[+] Vivaldi is already installed."
+        return 0
+    else
+        wget -qO $VIVA "$VIVALDI_URL"
+        if [[ -f "$VIVA" ]]; then
+            dpkg -i $VIVA 2>/dev/null || true
+            echo "Downloaded and installed Vivaldi."
+        else
+            echo "Failed to download Vivaldi. Please check or try again later."
+            exit 1
+        fi
+    fi
+}
+
+# Install VS Code if it isn't.
+install_vscode() {
+    echo
+    echo "[+] Installing VS Code."
+    local CODE_URL="https://code.visualstudio.com/sha/download?build=stable&os=linux-deb-x64"
+    local CODE="/home/kali/Downloads/code_amd64.deb"
+
+    # Check if code is installed.
+    if command -v code >/dev/null 2>&1; then
+        echo "[+] Code is already installed."
+        return 0
+    else
+        wget -qO $CODE "$CODE_URL"
+        if [[ -f "$CODE" ]]; then
+            dpkg -i $CODE 2>/dev/null || true
+            echo "[+] Downloaded and installed VS Code."
+        else
+            echo "[-] Failed to download VS Code. Please check or try again later."
+            exit 1
+        fi
+    fi
+}
+
+install_rust_tools() {
+    echo
+    local ALL="$1"
+    KALI_USER="kali"
+    KALI_HOME="/home/${KALI_USER}"
+    KALI_CARGO_BIN="${KALI_HOME}/.cargo/bin"
+    INSTALL_ALL=false
+
+    # Optional --all flag.
+    if [[ "$ALL" == "--all" ]]; then
+        INSTALL_ALL=true
+        echo "[*] --all entered: Installing all 3 rust tools."
+    elif [[ "$ALL" == "--none" ]]; then
+        echo "[*] --none entered: Skipping all 3 rust tools."
+        return 0
+    fi
+
+    # Prompt user to install each one if no --all option.
+    ask_install() {
+        local tool="$1"
+
+        if [ "$INSTALL_ALL" = true ]; then
+            return 0
+        fi
+
+        while true; do
+            # Default to Y if Enter pressed.
+            read -p "Continue installing $tool? [Y/n]: " yn
+            yn=${yn:-Y}
+            case $yn in
+                [Yy]* ) return 0 ;;
+                [Nn]* ) return 1 ;;
+                * ) echo "y (yes) or n (no)." ;;
+            esac
+        done
+    }
+
+    # Function to install cargo globally using apt
+    install_cargo_via_apt() {
+        echo "[*] Running apt update and installing cargo."
+        apt update && apt install -y cargo
+    }
+
+    if command -v cargo >/dev/null 2>&1; then
+        echo "[✓] Cargo is installed: $(which cargo)"
+    else
+        echo "[!] 'cargo' not found in /usr/bin PATH."
+        if install_cargo_via_apt; then
+            echo "[+] Installed cargo with apt install."
+        else
+            echo "[-] Cargo isn't and wasn't installed for some reason."
+            echo "[-] You'll need to install the rust tools manually."
+            return 1
+        fi
+    fi
+
+    # Make sure ~/.cargo/bin exists for kali user.
+    sudo -u $KALI_USER mkdir -p "$KALI_CARGO_BIN"
+
+    # Install rustscan, feroxbuster, and ripgrep only if missing.
+    install_tool() {
+        local rust_tool="$1"
+        local install_cmd="$2"
+
+        echo "[*] Checking if $rust_tool is already installed for $KALI_USER..."
+
+        if sudo -u $KALI_USER "$KALI_CARGO_BIN/$rust_tool" --version >/dev/null 2>&1; then
+            echo "[✓] $rust_tool is already installed. Skipping."
+        else
+            echo "[+] Installing $rust_tool for $KALI_USER..."
+            sudo -u $KALI_USER bash -c "$install_cmd"
+        fi
+    }
+
+    # Prompt to install or auto-install if --all option present.
+    if ask_install "RustScan"; then
+        install_tool "rustscan" "cargo install rustscan --root $KALI_HOME/.cargo"
+    fi
+    if ask_install "Feroxbuster"; then
+        install_tool "feroxbuster" "cargo install feroxbuster --root $KALI_HOME/.cargo"
+    fi
+    if ask_install "Ripgrep (rg)"; then
+        install_tool "rg" "cargo install ripgrep --root $KALI_HOME/.cargo"
+    fi
+
+    echo "[*] Verify installed versions:"
+    for tool in rustscan feroxbuster rg; do
+        if [ -x "$KALI_CARGO_BIN/$tool" ]; then
+            echo -n " - $tool: "
+            sudo -u $KALI_USER "$KALI_CARGO_BIN/$tool" -V
+        fi
+    done
+
+    echo "[+] Copying Go and Cargo paths to bashrc/zsh."
+    echo "$ZSHBASH" >> /home/kali/.bashrc
+    echo "$ZSHBASH" >> /home/kali/.zshrc    
+}
+
 enable_fish() {
     # Run as root
     echo "[+] Permanently enable fish for kali user."
@@ -460,20 +468,6 @@ remove_downloads() {
     # Confirm ownership of remaining Downloads for kali user.
     find /home/kali/Downloads -type d -exec chown kali:kali {} \;
     find /home/kali/Downloads -type f -exec chown kali:kali {} \;
-
-    #if [ -f "${FILES[0]}" ]; then
-    #    # If the file exists, delete it
-    #    rm -rf "${FILES[0]}"
-    #fi
-    #if [ -f "${FILES[1]}" ]; then
-    #    # If the file exists, delete it
-    #    rm -rf "${FILES[1]}"
-    #fi
-    #if [ -d "${FILES[2]}" ]; then
-    #    # If the file exists, delete it
-    #    rm -rf "${FILES[2]}"
-    #fi    
-    #rm -rf "$DOWNLOADS"/code_amd64.deb "$DOWNLOADS"/vivaldi-stable_amd64.deb "$DOWNLOADS"/afterPMi3/Pictures 2>/dev/null
 }
 
 # Main setup function.
@@ -481,21 +475,24 @@ main() {
     echo "[+] Starting first boot as root setup for i3 kali user."
     echo
     # Install some tools, applications, and clean up.
-    # Uncomment code if necessary or comment out other tools you don't need.
-    i3_config
-    create_dirs
-    setup_bg
-    install_apt
-    install_vivaldi    
-    install_vscode    
-    install_rust_tools "$CARGO_INSTALL_ALL"
-    install_fonts
-    install_ohmytmux
-    install_fish_config
-    install_starship
-    install_nvm
-    enable_fish
-    remove_downloads
+    if [ "$ONLY_RUST" = true ]; then
+        install_rust_tools "$CARGO_INSTALL_ALL"
+    else
+        i3_config
+        create_dirs
+        setup_bg
+        install_apt
+        install_fonts
+        install_ohmytmux
+        install_fish_config
+        install_starship
+        install_nvm    
+        #install_autorecon    
+        install_vivaldi    
+        install_vscode    
+        install_rust_tools "$CARGO_INSTALL_ALL"
+        enable_fish
+        remove_downloads
 
     # /usr/bin/vmhgfs-fuse .host:/kali /home/shared -o subtype=vmhgfs-fuse
     echo

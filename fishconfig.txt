@@ -1,16 +1,18 @@
 if status is-interactive
     # Commands to run in interactive sessions can go here
 end
-set -x PATH $PATH /home/kali/.cargo/bin
-set -x PATH $PATH /home/kali/.local/bin
-set -x PATH $PATH /usr/local/go/bin
 
-set -x GOPATH $HOME/go
-set -x PATH $PATH $GOPATH/bin
-
-# export PATH=$PATH:/usr/local/go/bin
-#set -x GOPATH $PATH /usr/local/go
-#set -x PATH $PATH $GOPATH/bin
+# pipx paths
+set -gx PATH $PATH /home/kali/.local/bin
+set -gx PATH $HOME/.local/bin $PATH
+# Cargo / go paths
+set -gx GOPATH /home/kali/go
+set -gx PATH $PATH $GOPATH/bin
+set -gx PATH $PATH /usr/local/go/bin
+set -gx PATH $PATH /home/kali/.cargo/bin
+set -gx PATH $PATH /home/kali/.local/bin
+#source /home/kali/.cargo/env
+#source $HOME/.cargo/env
 
 set -g theme_nerd_fonts yes
 
@@ -41,4 +43,4 @@ function ipg
     ip a | grep -oP '^[\d]:\s*([^:]+):' $argv
 end
 
-starship init fish | source
+#starship init fish | source
