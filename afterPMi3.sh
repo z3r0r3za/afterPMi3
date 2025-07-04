@@ -3,16 +3,19 @@
 # afterPMi3.sh: This will set up the i3 config, some other configs and install packages for the kali user.
 # Use this script: after pimpmyi3 has finished, the VM has rebooted and is logged in as root.
 # This script assumes that afterPMi3 has been cloned or downloaded into: /home/kali/Downloads/afterPMi3
+# 
+# Packages: zaproxy, guake, pcmanfm, helix, obsidian, fish, terminator, tmux, xsel, oscanner, redis-tools, 
+# sipvicious, tnscmd10g, vivaldi, (vs)code (if necessary), rustscan, feroxbuster, ripgrep, cmake, pkg-config.
 #
-# Installed Packages: zaproxy, guake, pcmanfm, helix, fish, vim-gtk3, tmux, xsel, terminator, cmake, 
-# pkg-config, vivaldi, (vs)code (if necessary), rustscan, feroxbuster, ripgrep.
-#
-# Configurations: i3, tmux, fish (and enables it), feh, various fonts, backgrounds.
+# Configurations: i3, tmux, fish (and enables it), feh, various fonts, backgrounds, Obsidian TEMPLATE.zip.
+# /usr/bin/vmhgfs-fuse .host:/kali /home/shared -o subtype=vmhgfs-fuse
 
 # Paths for go and cargo copied to zshrc/bashrc.
 # The back slashes prevent variables from printing values.
+datetime=$(date +"%Y-%m-%d %H:%M:%S")
 ZSHBASH=$(cat <<-END_TEXT
-# Created by pipx on 2025-06-28 16:05:52
+# These paths were added on $datetime
+# Paths for pipx
 export PATH="\$PATH:/home/kali/.local/bin"
 export PATH=\$HOME/.local/bin:\$PATH
 # Paths for go and cargo.
@@ -24,6 +27,7 @@ source "/home/kali/.cargo/env"
 END_TEXT
 )
 
+# Run cat /home/kali/Downloads/afterPMi3/afterPMi3.log to view logs.
 exec > >(tee /home/kali/Downloads/afterPMi3/afterPMi3.log) 2>&1
 
 # Ensure the script is run as root
@@ -42,9 +46,12 @@ This script configures Kali Linux for the kali user after running pimpmyi3.sh.
 It installs additional tools, terminals, editors, fonts, i3 configs, and user shells.
 You can choose how Rust-based tools are installed:
 
-  --all     Install rustscan, feroxbuster, and ripgrep without prompting.
-  --none    Skip installation of all Rust tools.
-  (no flag) Interactive mode: ask before each Rust tool install.
+  1) --all      Install rustscan, feroxbuster, and ripgrep without prompting each time.
+  2) (no flag)  Interactive mode: Ask before each Rust tool install.
+  3) --none     Install everything, but skip installation of Rust tools.
+  4) --all      Only Rust: Install Rust tools without prompting each time.
+  5) (no flag)  Only Rust: Ask before each Rust tool install.
+  q)            Exit afterPMi3 without installing anything.
   
 Note: This script was written to be run directly as root, but using sudo from a non-root user with full privileges
 may work. It just hasn't been tested. If it's run with sudo, a password may be required.
@@ -56,33 +63,63 @@ fi
 # Display header and determine Rust tool install mode
 # \e]8;;https://github.com/Dewalt-arch/pimpmyi3\apimpmyi3\e]8;;\a
 clear
+cat <<'EOF'
+                                ;+->,                            
+                              .(vi3crl                           
+                              `ccci3c]                           
+                               '=i3-+'                           
+                                       i{\(_`                    
+                      ;+?~,           [cci3cn?`                  
+                     1ci3cu+          -ccvi3ccn?`                
+                    .nccci31           l\ccci3ccn?`              
+                     ^[i3\-'             l\ccci3ccn?^            
+                             i3}\),        l\ccci3ccn?`          
+            -I[I-           -cci3cv1,        l|ccci3ccx~         
+           }i3ccc]          <ucci3ccv{,        l\ccci3cc1        
+           \cci3c|           ,1vcci3ccv),        ljcci3vc1       
+           '-|/|+'             ,{vci3vccv1,       'tcci3vc>      
+                   >(ft1l        ,{vci3vccv}       "vcci3c}      
+                  ~cci3cc\l        ,{vci3vvcx.      |cvi3cx.     
+                  Ixcci3ccc\l        ,{vci3c1       fcci3cr.     
+                   `?nci3vccc\l        ":+$"       icci3vc)      
+                     `]nci3vccc\l                 !uci3ccv,      
+                       `]nci3vccc\l             ,{cci3vcc<       
+                         `]nci3vcccf[i=.___.+cIivcci3ccni        
+                           `]nci3vvccccnrjrxvccccvi3cv1^         
+                             `+fci3ccvcckalicvcci3cx}:           
+                                '-|i3cccccccccvi3]I"             
+                                   '+l<_]]?[[!)+'                                  
+EOF
 cat <<EOF
 
-##################################################
-##        afterPMi3 - Kali Setup Script         ##
-##################################################
+#########################################################################
+##                       afterPMi3 - Kali Setup                        ##
+#########################################################################
 
-This script continues setup after running pimpmyi3.
+This script continues a custom setup for kali user after running pimpmyi3.
 https://github.com/Dewalt-arch/pimpmyi3
 
-Choose your Rust tool install mode:
+Setup starts when key is pressed. Choose your Rust tool install mode:
 
-  [1] Install all Rust tools without prompting
-  [2] Skip all Rust tool installs
-  [3] Interactive prompt for each tool
+  [1] Include all the Rust tools without prompting
+  [2] Prompt user to install each Rust tool
+  [3] Skip all the Rust tool installs
+  [4] Only Rust: install all the tools
+  [5] Only Rust: prompt for each tool  
   [q] Quit
 
 EOF
 
 while true; do
-    read -p "Enter your choice [1/2/3/4/q]: " rust_choice
+    read -n1 -p "Enter option [1/2/3/4/5/q] or press q to exit: " rust_choice
     case "$rust_choice" in
-        1) CARGO_INSTALL_ALL="--all"; break ;;
-        2) CARGO_INSTALL_ALL="--none"; break ;;
-        3|"") CARGO_INSTALL_ALL=""; break ;;
-        4) ONLY_RUST=true; break ;;
+        1) w_rust_tools; CARGO_INSTALL="--all"; break ;;
+        2|"") w_rust_tools; CARGO_INSTALL=""; break ;;
+        3) wo_rust_tools; CARGO_INSTALL="--none"; break ;;        
+        4) o_rust_tools; CARGO_INSTALL="--all"; ONLY_RUST="--all"; break ;;
+        5) o_rust_tools; CARGO_INSTALL=""; ONLY_RUST=""; break ;;
         [Qq]) echo "Exiting..."; exit 0 ;;
-        *) echo "Invalid input. Please enter 1, 2, 3, 4, or q to quit." ;;
+        *) echo "Invalid input. Please enter 1, 2, 3, 4, or q to exit." ;;
     esac
 done
 
@@ -120,6 +157,7 @@ create_dirs() {
     mkdir -p /home/kali/Scripts && chown kali:kali /home/kali/Scripts
     mkdir -p /home/kali/labs && chown kali:kali /home/kali/labs
     mkdir -p /home/kali/kali && chown kali:kali /home/kali/kali
+    mkdir -p /home/kali/notes && chown kali:kali /home/kali/notes    
 }
 
 # Set backgrounds and pictures.
@@ -336,6 +374,41 @@ install_vscode() {
     fi
 }
 
+# Install Obsidian.
+install_obsidian() {
+    # Setup Obsidian template.
+    cd /home/kali/Downloads/afterPMi3
+    unzip -q TEMPLATE.zip
+    if [ ! -d "/home/kali/notes/TEMPLATE" ]; then
+        mv TEMPLATE /home/kali/notes
+        chown -R kali:kali /home/kali/notes/*
+        chown -R kali:kali /home/kali/notes/.[^.]*
+    fi
+
+    echo
+    echo "[+] Installing Obsidian."
+    local RELEASE_INFO=$(curl -s -H "User-Agent: curl" https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest)
+    local VERSION_NUM=$(echo "$RELEASE_INFO" | grep -o '"tag_name": *"[^"]*' | sed 's/.*"tag_name": *"//; s/".*//')
+    local VERSION=${VERSION_NUM#v}
+    local OBSIDIAN_URL="https://github.com/obsidianmd/obsidian-releases/releases/download/${VERSION_NUM}/obsidian_${VERSION}_amd64.deb"
+    local OBSIDIAN="/home/kali/Downloads/obsidian_amd64.deb"
+
+    # Check if code is installed.
+    if command -v obsidian >/dev/null 2>&1; then
+        echo "[+] Obsidian is already installed."
+        return 0
+    else
+        wget -qO $OBSIDIAN "$OBSIDIAN_URL"
+        if [[ -f "$OBSIDIAN" ]]; then
+            dpkg -i $OBSIDIAN 2>/dev/null || true
+            echo "[+] Downloaded and installed Obsidian."
+        else
+            echo "[-] Failed to download Obsidian. Please check or try again later."
+            exit 1
+        fi
+    fi    
+}
+
 install_rust_tools() {
     echo
     local ALL="$1"
@@ -357,6 +430,7 @@ install_rust_tools() {
     ask_install() {
         local tool="$1"
 
+        # Return and continue installation without asking.
         if [ "$INSTALL_ALL" = true ]; then
             return 0
         fi
@@ -470,38 +544,92 @@ remove_downloads() {
     find /home/kali/Downloads -type f -exec chown kali:kali {} \;
 }
 
-# Main setup function.
-main() {
-    echo "[+] Starting first boot as root setup for i3 kali user."
-    echo
-    # Install some tools, applications, and clean up.
-    if [ "$ONLY_RUST" = true ]; then
-        install_rust_tools "$CARGO_INSTALL_ALL"
-    else
-        i3_config
-        create_dirs
-        setup_bg
-        install_apt
-        install_fonts
-        install_ohmytmux
-        install_fish_config
-        install_starship
-        install_nvm    
-        #install_autorecon    
-        install_vivaldi    
-        install_vscode    
-        install_rust_tools "$CARGO_INSTALL_ALL"
-        enable_fish
-        remove_downloads
-
-    # /usr/bin/vmhgfs-fuse .host:/kali /home/shared -o subtype=vmhgfs-fuse
-    echo
-    echo "[+] afterPMi3 setup is finished."
-    echo "[+] Reboot or login as kali user to apply changes."
-    echo "[+] These key commands will change for kali user:"
-    echo "[+] To reboot press Alt-Shift-E, then press r."
-    echo "[+] To log in press Alt-Shift-E, then press e."
-    echo "[+] In the top right menu, select i3 and log in as kali."
+rust_message() {
+    local CI="$1"
+    local OR="$2"
+    if [ "$CI" == "--all" ]; then
+        echo "[+] Installing everything...."
+        echo "--------------------------------------------------------------------"
+        echo
+    elif [ "$CI" == "--none" ]; then
+        echo "[+] Installing everything except the Rust tools."
+        echo "--------------------------------------------------------------------"
+        echo
+    elif [[ "$CI" == "--all" && "$OR" == "--all" ]]; then
+        echo "[+] Installing only the Rust tools."
+        echo "--------------------------------------------------------------------"
+        echo
+    elif [[ "$CI" == "--none" && "$OR" == "" ]]; then
+        echo "[+] Installing only the Rust tools, prompting for each one."
+        echo "--------------------------------------------------------------------"
+        echo
+    fi    
 }
 
-main
+w_rust_tools() {
+    rust_message "$CARGO_INSTALL"
+    i3_config
+    create_dirs
+    setup_bg
+    install_apt
+    install_fonts
+    install_ohmytmux
+    install_fish_config
+    install_starship
+    install_nvm
+    install_autorecon
+    install_vivaldi
+    install_vscode
+    install_obsidian
+    install_rust_tools "$CARGO_INSTALL"
+    enable_fish
+    remove_downloads
+    finished
+}
+
+wo_rust_tools() {
+    rust_message "$CARGO_INSTALL"
+    i3_config
+    create_dirs
+    setup_bg
+    install_apt
+    install_fonts
+    install_ohmytmux
+    install_fish_config
+    install_starship
+    install_nvm
+    install_autorecon
+    install_vivaldi
+    install_vscode
+    install_obsidian
+    enable_fish
+    remove_downloads
+    finished
+}
+
+o_rust_tools() {
+    rust_message "$CARGO_INSTALL" "$ONLY_RUST"
+    install_rust_tools "$CARGO_INSTALL"
+    finishedrust
+}
+
+# Print when setup is finished.
+finished() {
+    echo
+    echo "[+] afterPMi3 is finished."
+    echo "-------------------------------------------------------------------"
+    echo "[+] Reboot or login as kali user to apply changes."
+    echo "[+] Before reboot: To reboot press Alt-Shift-E, then press r."
+    echo "[+] Before reboot: To log in press Alt-Shift-E, then press e."
+    echo "[+] Then in the top right menu, select i3 and log in as kali."
+    echo "[+] Before reboot: To reboot press Alt-Meta-E, then press r."
+    echo "[+] Before reboot: To log in press Alt-Meta-E, then press e."
+}
+
+# Print when setup is finished.
+finishedrust() {
+    echo
+    echo "[+] afterPMi3 is finished the Rust tools installation."
+    echo "-------------------------------------------------------------------"
+}
+
