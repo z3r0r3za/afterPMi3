@@ -8,6 +8,7 @@ When afterPMi3 is finished and the VM is logged in as the kali user (see steps b
 
 - vivaldi
 - code
+- obsidian
 - rustscan
 - feroxbuster
 - rg (ripgrep)
@@ -19,7 +20,7 @@ When afterPMi3 is finished and the VM is logged in as the kali user (see steps b
 - terminator 
 - tmux 
 - xsel 
-- and a couple others
+- and some others...
 
 ***Other installs, configs, etc.***
 
