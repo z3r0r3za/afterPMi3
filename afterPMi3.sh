@@ -26,19 +26,20 @@ if [[ "$1" == "--help" ]]; then
 Usage: ./afterPMi3.sh
 
 This script configures Kali Linux for the kali user after running pimpmyi3.sh.
-It installs additional tools, terminals, editors, fonts, i3 configs, and user shells.
-You can choose how Rust-based tools are installed:
+It installs additional tools, terminals, editors, fonts, i3 configs, and user 
+shells. The Rust-based tools can take a little time to install so you can choose 
+if or how they are installed:
 
-  1) --all      Install rustscan, feroxbuster, and ripgrep without prompting each time.
-  2) (no flag)  Interactive mode: Ask before each Rust tool installation.
-  3) --none     Install everything, but skip installation of Rust tools.
-  4) --all      Only Rust: Install Rust tools without prompting each time.
-  5) (no flag)  Only Rust: Ask before each Rust tool install.
-  q)            Exit afterPMi3 without installing anything.
+  1) --all     Install rustscan, feroxbuster, ripgrep without prompting for each.
+  2) (no flag) Interactive mode: Ask before each Rust tool installation.
+  3) --none    Install everything, but skip installation of Rust tools.
+  4) --all     Only Rust: Install Rust tools without prompting each time.
+  5) (no flag) Only Rust: Ask before each Rust tool install.
+  q)           Exit afterPMi3 without installing anything.
   
 Note: This script was written to be run as root right after first reboot after running pimpmyi3, 
-but using sudo from a non-root user with full privileges may work. It just hasn't been tested. 
-If it's run with sudo, a password may be required.
+but using sudo or sudo su from a non-root user with full privileges may work. It just hasn't 
+been tested. If it's run as non root with just sudo, a password may be required.
 
 EOF
     exit 0
@@ -82,6 +83,8 @@ cat <<EOF
 
 This script continues a custom setup for kali user after running pimpmyi3.
 https://github.com/Dewalt-arch/pimpmyi3
+It installs tools, editors, fonts, i3 and other configs, shells, etc.
+To see a little more press q to exit and then try ./afterPMi3.sh --help
 
 Setup starts when key is pressed. Choose your Rust tool install mode:
 
