@@ -12,6 +12,7 @@ When afterPMi3 is finished and the VM is logged in as the kali user (see steps b
 - rustscan
 - feroxbuster
 - rg (ripgrep)
+- bloodhound-cli
 - zaproxy
 - guake 
 - pcmanfm 
