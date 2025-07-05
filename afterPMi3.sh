@@ -5,29 +5,12 @@
 # This script assumes that afterPMi3 has been cloned or downloaded into: /home/kali/Downloads/afterPMi3
 # 
 # Packages: zaproxy, guake, pcmanfm, helix, obsidian, fish, terminator, tmux, xsel, oscanner, redis-tools, 
-# sipvicious, tnscmd10g, vivaldi, (vs)code (if necessary), rustscan, feroxbuster, ripgrep, cmake, pkg-config.
+# sipvicious, tnscmd10g, bloodhound-ce vivaldi, code, rustscan, feroxbuster, ripgrep, cmake, pkg-config.
 #
 # Configurations: i3, tmux, fish (and enables it), feh, various fonts, backgrounds, Obsidian TEMPLATE.zip.
 # /usr/bin/vmhgfs-fuse .host:/kali /home/shared -o subtype=vmhgfs-fuse
 
-# Paths for go and cargo copied to zshrc/bashrc.
-# The back slashes prevent variables from printing values.
-datetime=$(date +"%Y-%m-%d %H:%M:%S")
-ZSHBASH=$(cat <<-END_TEXT
-# These paths were added on $datetime
-# Paths for pipx
-export PATH="\$PATH:/home/kali/.local/bin"
-export PATH=\$HOME/.local/bin:\$PATH
-# Paths for go and cargo.
-export GOPATH=/home/kali/go
-export PATH=\$PATH:\$GOPATH/bin
-export PATH=\$PATH:/usr/local/go/bin
-source "/home/kali/.cargo/env"
-. "\$HOME/.cargo/env"
-END_TEXT
-)
-
-# Run cat /home/kali/Downloads/afterPMi3/afterPMi3.log to view logs.
+# cat /home/kali/Downloads/afterPMi3/afterPMi3.log to view logs.
 exec > >(tee /home/kali/Downloads/afterPMi3/afterPMi3.log) 2>&1
 
 # Ensure the script is run as root
@@ -40,21 +23,22 @@ fi
 if [[ "$1" == "--help" ]]; then
     cat <<EOF
 
-Usage: ./afterPMi3.sh [--all|--none|--help]
+Usage: ./afterPMi3.sh
 
 This script configures Kali Linux for the kali user after running pimpmyi3.sh.
 It installs additional tools, terminals, editors, fonts, i3 configs, and user shells.
 You can choose how Rust-based tools are installed:
 
   1) --all      Install rustscan, feroxbuster, and ripgrep without prompting each time.
-  2) (no flag)  Interactive mode: Ask before each Rust tool install.
+  2) (no flag)  Interactive mode: Ask before each Rust tool installation.
   3) --none     Install everything, but skip installation of Rust tools.
   4) --all      Only Rust: Install Rust tools without prompting each time.
   5) (no flag)  Only Rust: Ask before each Rust tool install.
   q)            Exit afterPMi3 without installing anything.
   
-Note: This script was written to be run directly as root, but using sudo from a non-root user with full privileges
-may work. It just hasn't been tested. If it's run with sudo, a password may be required.
+Note: This script was written to be run as root right after first reboot after running pimpmyi3, 
+but using sudo from a non-root user with full privileges may work. It just hasn't been tested. 
+If it's run with sudo, a password may be required.
 
 EOF
     exit 0
@@ -409,7 +393,38 @@ install_obsidian() {
     fi    
 }
 
-install_rust_tools() {
+# Install Bloodhound CE that uses docker.
+# https://bloodhound.specterops.io/get-started/quickstart/community-edition-quickstart
+install_bloodhound_ce() {
+    local BLOODHOUND_CLI="/opt/bloodhound-cli"
+    if [[ -f "$BLOODHOUND_CLI" ]]; then
+        echo "[+] Looks like bloodhound-cli already exists inside the opt directory."
+    else
+        cd /opt
+        sudo -u kali bash -c "wget https://github.com/SpecterOps/bloodhound-cli/releases/latest/download/bloodhound-cli-linux-amd64.tar.gz"
+        sudo -u kali bash -c "tar -xvzf bloodhound-cli-linux-amd64.tar.gz"
+        sudo -u kali bash -c "./bloodhound-cli install"
+    fi
+}
+
+# Paths for go and cargo copied to zshrc/bashrc.
+# The back slashes prevent variables from printing values.
+datetime=$(date +"%Y-%m-%d %H:%M:%S")
+ZSHBASH=$(cat <<-END_TEXT
+# These paths were added on $datetime
+# Paths for pipx
+export PATH="\$PATH:/home/kali/.local/bin"
+export PATH=\$HOME/.local/bin:\$PATH
+# Paths for go and cargo.
+export GOPATH=/home/kali/go
+export PATH=\$PATH:\$GOPATH/bin
+export PATH=\$PATH:/usr/local/go/bin
+source "/home/kali/.cargo/env"
+. "\$HOME/.cargo/env"
+END_TEXT
+)
+
+install_rust_tools() {    
     echo
     local ALL="$1"
     KALI_USER="kali"
@@ -581,6 +596,7 @@ w_rust_tools() {
     install_vivaldi
     install_vscode
     install_obsidian
+    install_bloodhound_ce
     install_rust_tools "$CARGO_INSTALL"
     enable_fish
     remove_downloads
@@ -602,6 +618,7 @@ wo_rust_tools() {
     install_vivaldi
     install_vscode
     install_obsidian
+    install_bloodhound_ce
     enable_fish
     remove_downloads
     finished
@@ -617,7 +634,12 @@ o_rust_tools() {
 finished() {
     echo
     echo "[+] afterPMi3 is finished."
-    echo "-------------------------------------------------------------------"
+    echo "------------------------------------------------------------------------"
+    echo "Bloodhound-CE default password will look something like this:"
+    echo "...log in as admin with this password: mSohlqWnVCflV60PzWQKdqYHxYGM3zUs"
+    echo "[+] Get admin password: bloodhound-cli config get default_password"
+    echo "[+] Access the BloodHound at: http://127.0.0.1:8080/ui/login"
+    echo "------------------------------------------------------------------------"
     echo "[+] Reboot or login as kali user to apply changes."
     echo "[+] Before reboot: To reboot press Alt-Shift-E, then press r."
     echo "[+] Before reboot: To log in press Alt-Shift-E, then press e."
