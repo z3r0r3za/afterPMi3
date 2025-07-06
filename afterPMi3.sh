@@ -126,9 +126,11 @@ i3_config() {
     ln -s /etc/i3status.conf /home/kali/.config/i3/i3status.conf
     chown -h kali:kali /home/kali/.config/i3/i3status.conf
 
-    # Copy i3 new config file for kali user.
+    # Copy i3 new config and key commands files for kali user.
     cp /home/kali/Downloads/afterPMi3/config_i3.txt /home/kali/.config/i3/config
     chown kali:kali /home/kali/.config/i3/config
+    cp /home/kali/Downloads/afterPMi3/i3_keys.txt /home/kali/.config/i3/i3_keys
+    chown kali:kali /home/kali/.config/i3/i3_keys
 
     # Copy new i3 config file for root.
     mv /root/.config/i3/config /root/.config/i3/config_OLD
@@ -175,7 +177,7 @@ install_apt() {
     echo
     echo "[+] Checking and installing some missing packages."
     local packages=(
-        zaproxy guake pcmanfm hx fish tmux xsel terminator oscanner redis-tools sipvicious tnscmd10g cmake pkg-config
+        zaproxy guake pcmanfm hx fish tmux xsel terminator vlc galculator oscanner redis-tools sipvicious tnscmd10g cmake pkg-config
     )
     # Array to hold packages that are not installed
     local -a to_install=()

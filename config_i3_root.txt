@@ -52,6 +52,9 @@ set $right semicolon
 # use Mouse+$modkey to drag floating windows to their wanted position
 floating_modifier $modkey
 
+# i3 key commands
+bindsym $modkey+i exec --no-startup-id mousepad /home/kali/.config/i3/i3_keys.txt
+
 # modkey+ctrl+NUMBER quicklaunch applications
 # only the first 6 keys have been programmed with commonly used program
 # feel free to Change and customize and move them around for you!
@@ -73,9 +76,9 @@ bindsym $modkey+F4 exec --no-startup-id code
 bindsym $modkey+F5 exec --no-startup-id pcmanfm
 bindsym $modkey+F6 exec --no-startup-id zaproxy
 bindsym $modkey+F7 exec --no-startup-id burpsuite
-bindsym $modkey+F8 exec --no-startup-id gedit
-#bindsym $modkey+F9 exec --no-startup-id 
-#bindsym $modkey+F10 exec --no-startup-id 
+bindsym $modkey+F8 exec --no-startup-id bloodhound
+bindsym $modkey+F9 exec --no-startup-id obsidian
+bindsym $modkey+F10 exec --no-startup-id hx
 #bindsym $modkey+F8 exec --no-startup-id terminator -e 'tmux new -s hack'
 #bindsym $modkey+F9 exec --no-startup-id terminator -e 'ip a | grep tun0'
 #bindsym $modkey+F10 exec --no-startup-id terminator -e 'msfconsole'
@@ -83,7 +86,7 @@ bindsym $modkey+F8 exec --no-startup-id gedit
 # start a terminal
 # bindsym $modkey+Return exec --no-startup-id konsole
 # bindsym $modkey+Return exec --no-startup-id i3-sensible-terminal
-bindsym $modkey+Return exec --no-startup-id alacritty
+bindsym $modkey+Return exec --no-startup-id terminator
 
 # kill focused window
 bindsym $modkey+Shift+q kill
@@ -308,6 +311,7 @@ bindsym $modkey+mod2+Shift+KP_0 move container to workspace $ws10
 for_window [class="Guake"] floating enable border normal
 for_window [class="Galculator"] floating enable border normal
 for_window [title="VLC"] floating enable border normal
+for_window [title="Mousepad"] floating enable border normal
 
 # reload the configuration file
 bindsym $modkey+Shift+c reload

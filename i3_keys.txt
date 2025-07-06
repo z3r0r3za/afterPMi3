@@ -1,0 +1,127 @@
+
+#################### Reload i3 config 
+modkey+Shift+c
+
+#################### i3 key commands 
+modkey+i
+
+#################### terminator 
+modkey+Return 
+
+#################### LAUNCH 
+modkey+F1  - firefox
+modkey+F2  - vivaldi
+modkey+F3  - terminator
+modkey+F4  - code
+modkey+F5  - pcmanfm
+modkey+F6  - zaproxy
+modkey+F7  - burpsuite
+modkey+F8  - bloodhound
+modkey+F9  - obsidian
+modkey+F10 - hx
+
+#################### MENU 
+modkey+d
+modkey+f
+modkey+g
+
+#################### Use these keys for focus, movement, and resize
+# directions when reaching for the arrows is not convenient
+set $up l
+set $down k
+set $left j
+set $right semicolon
+
+#################### switch to workspace
+modkey+1 
+modkey+2
+[...]
+
+modkey+mod2+KP_1 
+modkey+mod2+KP_2 
+[...]
+
+#################### move focused container to workspace
+modkey+Shift+1 
+modkey+Shift+2 
+[...]
+
+modkey+mod2+Shift+KP_1 
+modkey+mod2+Shift+KP_2 
+[...]
+
+#################### Toggle bar
+modkey+m
+
+#################### Toggle bar
+modkey+m
+
+#################### FlameShot Key to take screenshot
+# SCREENSHOT NORMAL
+# alt+printscreen = normal screenshot
+modkey+Sys_Req 
+
+#################### SCREENSHOT ONLY INVERT  OUTPUT: COLOR
+modkey+Shift+Sys_Req 
+
+#################### SCREENSHOT INVERTED  OUTPUT: MONOCHROME
+# alt+shift+printscreen = inverted screenshot for reporting
+modkey+Control+Sys_Req
+
+#################### change focus
+modkey+$left 
+modkey+$down 
+modkey+$up 
+modkey+$right 
+
+#################### you can use the cursor keys:
+modkey+Left 
+modkey+Down 
+modkey+Up 
+modkey+Right 
+
+#################### move focused window
+modkey+Shift+$left 
+modkey+Shift+$down 
+modkey+Shift+$up 
+modkey+Shift+$right 
+
+#################### you can use the cursor keys:
+modkey+Shift+Left 
+modkey+Shift+Down 
+modkey+Shift+Up 
+modkey+Shift+Right 
+
+#################### resize tiles using control key + up down left right
+modkey+Ctrl+Left 
+modkey+Ctrl+Down 
+modkey+Ctrl+Up 
+modkey+Ctrl+Right 
+
+#################### resize tiles using control key + up down left right
+modkey+Ctrl+Left 
+modkey+Ctrl+Down 
+modkey+Ctrl+Up 
+modkey+Ctrl+Right 
+
+#################### split in horizontal orientation
+modkey+h 
+
+#################### split in vertical orientation
+modkey+v
+
+#################### enter fullscreen mode for the focused container
+# modified from modkey+f for alt key users...
+modkey+Shift+f 
+
+#################### change container layout (stacked, tabbed, toggle split)
+modkey+s 
+modkey+w 
+modkey+e 
+
+#################### toggle tiling / floating
+modkey+Shift+space 
+
+#################### change focus between tiling / floating windows
+modkey+space 
+
