@@ -48,33 +48,19 @@ fi
 # Display header and determine Rust tool install mode
 # \e]8;;https://github.com/Dewalt-arch/pimpmyi3\apimpmyi3\e]8;;\a
 clear
-cat <<'EOF'
-                                ;+->,                            
-                              .(vi3crl                           
-                              `ccci3c]                           
-                               '=i3-+'                           
-                                       i{\(_`                    
-                      ;+?~,           [cci3cn?`                  
-                     1ci3cu+          -ccvi3ccn?`                
-                    .nccci31           l\ccci3ccn?`              
-                     ^[i3\-'             l\ccci3ccn?^            
-                             i3}\),        l\ccci3ccn?`          
-            -I[I-           -cci3cv1,        l|ccci3ccx~         
-           }i3ccc]          <ucci3ccv{,        l\ccci3cc1        
-           \cci3c|           ,1vcci3ccv),        ljcci3vc1       
-           '-|/|+'             ,{vci3vccv1,       'tcci3vc>      
-                   >(ft1l        ,{vci3vccv}       "vcci3c}      
-                  ~cci3cc\l        ,{vci3vvcx.      |cvi3cx.     
-                  Ixcci3ccc\l        ,{vci3c1       fcci3cr.     
-                   `?nci3vccc\l        ":+$"       icci3vc)      
-                     `]nci3vccc\l                 !uci3ccv,      
-                       `]nci3vccc\l             ,{cci3vcc<       
-                         `]nci3vcccf[i=.___.+cIivcci3ccni        
-                           `]nci3vvccccnrjrxvccccvi3cv1^         
-                             `+fci3ccvcckalicvcci3cx}:           
-                                '-|i3cccccccccvi3]I"             
-                                   '+l<_]]?[[!)+'                                  
-EOF
+# ascii art of the blue i3 logo.
+i3asciiart=$(base64 -d <<< "
+H4sICBRPbGgAA2kzX29yaWdpbmFsLnR4dACllM+OgjAQxu8+RTWboCnFEG7+I3vkGVjU3UlI6hIO
+RBsSCs++0AIWqMjqnOh08uObr9Mi9GbMnhVsMTmYbxCsJaMOJNHrhDMAlIjgdQIy9tQh2KjkWK8y
+mqDZ1xLTfxC22C1UB33RTvypsURPsKv6G74nCEBlKsTuzySCFQsLbSUVcekqxD0ZeglHnzprYnRy
+d0THjXEfqZPzVevGHaEY1AEQz/eIuhb1zB4i0kJLyKs9dXh2N1nPsiHD1hG42FNtMm1WM5RWLlWK
+tQiVYBC+5r3xMzMm6pVe6FUiLI0PdRyW4dWOhoy8UcFUsRpCIYXzPoNBKn9LuZiteqUheKlEDBhN
+6/NQFCQPCejsxlK3wlhs8MeiMUL6sHrsQ8kIhow25jd5POsxwgjDzKQC2KFxgsoIfbq3TgidLDOl
+rH81xq5FzaggECeXJBVfTAz6EU0hlAwcyp4Bfr8jClJAmm+UmqdPXDmo4mhllAICb9EpmPJIGjja
+nYLA9f35Chv93anP7OOY/QEe/7QW9QYAAA==
+" | gunzip)
+
+echo -e "\e[34m$i3asciiart\e[0m"
 cat <<EOF
 
 #########################################################################
