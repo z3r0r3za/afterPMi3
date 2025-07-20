@@ -5,7 +5,7 @@
 # This script assumes that afterPMi3 has been cloned or downloaded into: /home/kali/Downloads/afterPMi3
 # 
 # Packages: zaproxy, guake, pcmanfm, helix, obsidian, fish, terminator, tmux, xsel, oscanner, redis-tools, 
-# sipvicious, tnscmd10g, bloodhound-ce vivaldi, code, rustscan, feroxbuster, ripgrep, cmake, pkg-config.
+# sipvicious, tnscmd10g, bloodhound-ce, hurl, vivaldi, code, rustscan, feroxbuster, ripgrep, cmake, pkg-config.
 #
 # Configurations: i3, tmux, fish (and enables it), feh, various fonts, backgrounds, Obsidian TEMPLATE.zip.
 # /usr/bin/vmhgfs-fuse .host:/kali /home/shared -o subtype=vmhgfs-fuse
@@ -163,7 +163,7 @@ install_apt() {
     echo
     echo "[+] Checking and installing some missing packages."
     local packages=(
-        zaproxy guake pcmanfm hx fish tmux xsel terminator vlc galculator oscanner redis-tools sipvicious tnscmd10g cmake pkg-config
+        zaproxy guake pcmanfm hx fish tmux xsel terminator hurl galculator oscanner redis-tools sipvicious tnscmd10g cmake pkg-config
     )
     # Array to hold packages that are not installed
     local -a to_install=()
@@ -398,6 +398,10 @@ install_bloodhound_ce() {
     fi
 }
 
+install_jython() {
+  # https://www.jython.org/installation.html
+}
+
 # Paths for go and cargo copied to zshrc/bashrc.
 # The back slashes prevent variables from printing values.
 datetime=$(date +"%Y-%m-%d %H:%M:%S")
@@ -588,6 +592,7 @@ w_rust_tools() {
     install_vscode
     install_obsidian
     install_bloodhound_ce
+    #install_jython
     install_rust_tools "$CARGO_INSTALL"
     enable_fish
     remove_downloads
@@ -610,6 +615,7 @@ wo_rust_tools() {
     install_vscode
     install_obsidian
     install_bloodhound_ce
+    #install_jython
     enable_fish
     remove_downloads
     finished
