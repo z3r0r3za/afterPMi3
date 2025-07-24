@@ -370,7 +370,7 @@ bar {
     strip_workspace_numbers yes
     font pango: Terminus (TTF) medium 12
     separator_symbol "]["
-    #font pango: Inconsolata 11
+    #font pango: FontAwesome, Inconsolata 11
     #status_command /usr/bin/bumblebee-status -m nic cpu \
     #    -m memory battery date time \
     #    -p time.format="%H:%M" date.format="%a, %b %d %Y" nic.exclude="lo,br,docker" \
