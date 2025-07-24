@@ -163,7 +163,7 @@ install_apt() {
     echo
     echo "[+] Checking and installing some missing packages."
     local packages=(
-        zaproxy guake pcmanfm hx fish tmux xsel terminator bumblebee-status gnome-system-monitor hurl galculator oscanner redis-tools sipvicious tnscmd10g cmake pkg-config
+        zaproxy guake pcmanfm hx fish tmux xsel terminator bumblebee-status gnome-system-monitor pamixer hurl galculator oscanner redis-tools sipvicious tnscmd10g cmake pkg-config
     )
     # Array to hold packages that are not installed
     local -a to_install=()
