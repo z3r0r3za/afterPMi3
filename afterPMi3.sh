@@ -7,7 +7,8 @@
 # Packages: zaproxy, guake, pcmanfm, helix, obsidian, fish, terminator, tmux, xsel, oscanner, redis-tools, 
 # sipvicious, tnscmd10g, bloodhound-ce, hurl, vivaldi, code, rustscan, feroxbuster, ripgrep, cmake, pkg-config.
 #
-# Configurations: i3, tmux, fish (and enables it), feh, various fonts, backgrounds, Obsidian TEMPLATE.zip.
+# Configurations: i3, bumblebee-status, tmux, fish (and enables it), feh, powerline and other fonts, backgrounds, 
+# Obsidian TEMPLATE.zip.
 # /usr/bin/vmhgfs-fuse .host:/kali /home/shared -o subtype=vmhgfs-fuse
 
 # cat /home/kali/Downloads/afterPMi3/afterPMi3.log to view logs.
@@ -163,7 +164,7 @@ install_apt() {
     echo
     echo "[+] Checking and installing some missing packages."
     local packages=(
-        zaproxy guake pcmanfm hx fish tmux xsel terminator bumblebee-status gnome-system-monitor pamixer hurl galculator oscanner redis-tools sipvicious tnscmd10g cmake pkg-config
+        zaproxy guake pcmanfm hx fish tmux xsel xmlstarlet terminator bumblebee-status gnome-system-monitor pamixer hurl galculator oscanner redis-tools sipvicious tnscmd10g cmake pkg-config
     )
     # Array to hold packages that are not installed
     local -a to_install=()
@@ -289,6 +290,10 @@ install_starship() {
     chown kali:kali /home/kali/.config/starship.toml   
 }
 
+install_bs_theme() {
+    cp /home/kali/Downloads/afterPMi3/solarpower.json /usr/share/bumblebee-status/themes/solarized-powerlined.json
+}
+
 # Install nvm for kali user.
 install_nvm() {
     echo "[+] Install nvm for kali user."
@@ -399,7 +404,60 @@ install_bloodhound_ce() {
 }
 
 install_jython() {
-  # https://www.jython.org/installation.html
+    # https://www.jython.org/installation.html
+    # maven-metadata URL for extracting the latest version number.
+    METADATA_URL="https://repo1.maven.org/maven2/org/python/jython-installer/maven-metadata.xml"
+    METADATA_CONTENTS=$(curl -s "$METADATA_URL")
+
+    # Check for xmlstarlet and use it if it's installed.
+    if ! command -v xmlstarlet &> /dev/null; then
+        echo "[-] xmlstarlet was not found. Using grep and sed."
+        LATEST_VERSION=$(echo "$METADATA_CONTENTS" | grep -oP '<latest>[^<]+' | sed 's/<latest>//;s/<.*//')
+    else    
+        LATEST_VERSION=$(xmlstarlet sel -t -v "//latest" -n < <(curl -s "$METADATA_URL"))    
+    fi
+
+    # https://repo1.maven.org/maven2/org/python/jython-installer/2.7.4/jython-installer-2.7.4.jar
+    INSTALLER_URL="https://repo1.maven.org/maven2/org/python/jython-installer/$LATEST_VERSION/jython-installer-$LATEST_VERSION.jar"
+
+    INSTALL_DIR="jython$LATEST_VERSION"
+
+    # Create installation directory.
+    mkdir -p "/home/kali/$INSTALL_DIR"
+
+    # Download the Jython installer JAR.
+    echo "[+] Downloading Jython $INSTALL_DIR installer"
+    curl -o jython-installer.jar "$INSTALLER_URL"
+
+    # Check if download was successful from previous command.
+    if [ $? -ne 0 ]; then
+        echo "[-] Failed to download Jython installer. Please check the URL and try again later."
+        exit 1
+    fi
+
+    # Run the installer with automation.
+    echo "[+] Installing Jython version $VERSION..."
+    java -jar jython-installer.jar \
+        --no-gui \                  # Run in non-GUI mode.
+        --install "$INSTALL_DIR" \  # Install to specified directory.
+        --target "$INSTALL_DIR" \   # Target directory (same as install).
+        --force \                   # Overwrite if needed.
+        --no-verify \               # Skip checksum verification (optional).
+        --no-checksum \             # Skip checksum verification (optional).
+        --no-include \              # Skip including documentation (optional).
+        --no-javadoc \              # Skip including Javadoc (optional).
+        --no-source \               # Skip including source code (optional).
+
+    # Check if installation was successful from previous command.
+    if [ $? -ne 0 ]; then
+        echo "[-] Jyton installation failed. You will have to install it manually."
+        exit 1
+    fi
+
+    # Give owner as kali.
+    chown kali:kali "/home/kali/$INSTALL_DIR"
+    chown -R kali:kali "/home/kali/$INSTALL_DIR/*"
+    chown -R kali:kali "/home/kali/$INSTALL_DIR/.[^.]*"   
 }
 
 # Paths for go and cargo copied to zshrc/bashrc.
@@ -586,6 +644,7 @@ w_rust_tools() {
     install_ohmytmux
     install_fish_config
     install_starship
+    install_bs_theme
     install_nvm
     install_autorecon
     install_vivaldi
@@ -609,6 +668,7 @@ wo_rust_tools() {
     install_ohmytmux
     install_fish_config
     install_starship
+    install_bs_theme
     install_nvm
     install_autorecon
     install_vivaldi

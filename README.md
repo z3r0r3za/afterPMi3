@@ -4,6 +4,8 @@ pimpmyi3 also downloads and runs [pimpmykali](https://github.com/Dewalt-arch/pim
 
 When afterPMi3 is finished and the VM is logged in as the kali user (see steps below), it will have a different i3 config, fish shell with the tide theme (optional starship), oh-my-tmux, nvm (for node), fonts, a different background for each desktop, and more tools.
 
+After the latest modifications to the script it may not work perfectly because it hasn't been fully tested yet (Date of this message: 07/26/25).
+
 ***Installed Packages***
 
 - vivaldi
@@ -13,20 +15,27 @@ When afterPMi3 is finished and the VM is logged in as the kali user (see steps b
 - feroxbuster
 - rg (ripgrep)
 - bloodhound-cli
+- oscanner
+- xmlstarlet
+- redis-tools
+- jython - not tested
+- sipvicious
 - zaproxy
-- guake 
-- pcmanfm 
+- hurl
+- guake
+- pcmanfm
 - fish
 - hx (helix)
-- terminator 
-- tmux 
-- xsel 
-- and some others...
+- terminator
+- tmux
+- xsel
+- some others...
 
 ***Other installs, configs, etc.***
 
 - [nerd fonts](https://github.com/ryanoasis/nerd-fonts)
-- [powerline](https://github.com/powerline/fonts) fonts
+- [powerline fonts](https://github.com/powerline/fonts)
+- [bumblebee-status](https://github.com/tobi-wan-kenobi/bumblebee-status)
 - fish config
     - [jorgebucaran/fisher](https://github.com/jorgebucaran/fisher)
     - [edc/bass](https://github.com/edc/bass)
@@ -37,4 +46,7 @@ When afterPMi3 is finished and the VM is logged in as the kali user (see steps b
 
 ***Complete Steps***
 
-Coming soon...
+Bumblebee-status needs to be uncommented in the i3-wm config (~/.config/i3/config) and i3 reloaded, if you want to use it.
+Starship needs to be uncommented in the fish config and the config reloaded, if you want to use it.
+
+Coming soon, if it's needed...
