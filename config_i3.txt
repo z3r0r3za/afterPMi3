@@ -378,7 +378,7 @@ bar {
     #font pango: FontAwesome, Hack 11
     #status_command /usr/bin/bumblebee-status -m nic cpu \
     #    -m memory date time pamixer \
-    #    -p time.format="%H:%M" date.format="%a, %b %d %Y" nic.exclude="lo,br,docker" pamixer.percent_change=1% \
+    #    -p time.format="%H:%M" date.format="%a, %b %d %Y" nic.exclude="lo,br,docker,veth,nordlynx" pamixer.percent_change=1% \
     #    -t solarized-powerline
 
     colors {
