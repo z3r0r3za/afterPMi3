@@ -4,8 +4,9 @@
 # Use this script: after pimpmyi3 has finished, the VM has rebooted and is logged in as root.
 # This script assumes that afterPMi3 has been cloned or downloaded into: /home/kali/Downloads/afterPMi3
 # 
-# Packages: zaproxy, guake, pcmanfm, helix, obsidian, fish, terminator, tmux, xsel, oscanner, redis-tools, 
-# sipvicious, tnscmd10g, bloodhound-ce, hurl, vivaldi, code, rustscan, feroxbuster, ripgrep, cmake, pkg-config.
+# Packages: zaproxy, guake, pcmanfm, helix, sublime-text, obsidian, fish, terminator, tmux, xsel, oscanner, 
+# redis-tools, sipvicious, tnscmd10g, bloodhound-ce, hurl, vivaldi, code, rustscan, feroxbuster, ripgrep, 
+# cmake, pkg-config.
 #
 # Configurations: i3, bumblebee-status, tmux, fish (and enables it), feh, powerline and other fonts, backgrounds, 
 # Obsidian TEMPLATE.zip.
@@ -159,12 +160,17 @@ setup_bg() {
     fi    
 }
 
+setup_subl() {
+    wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | tee /etc/apt/keyrings/sublimehq-pub.asc > /dev/null
+    echo -e 'Types: deb\nURIs: https://download.sublimetext.com/\nSuites: apt/stable/\nSigned-By: /etc/apt/keyrings/sublimehq-pub.asc' | tee /etc/apt/sources.list.d/sublime-text.sources
+}
+
 # Check and install packages.
 install_apt() {
     echo
     echo "[+] Checking and installing some missing packages."
     local packages=(
-        zaproxy guake pcmanfm hx fish tmux xsel xmlstarlet terminator bumblebee-status gnome-system-monitor pamixer hurl galculator oscanner redis-tools sipvicious tnscmd10g cmake pkg-config
+        zaproxy guake pcmanfm hx sublime-text fish tmux xsel xmlstarlet terminator bumblebee-status gnome-system-monitor pamixer hurl galculator oscanner redis-tools sipvicious tnscmd10g cmake pkg-config
     )
     # Array to hold packages that are not installed
     local -a to_install=()
@@ -639,6 +645,7 @@ w_rust_tools() {
     i3_config
     create_dirs
     setup_bg
+    setup_subl
     install_apt
     install_fonts
     install_ohmytmux
@@ -663,6 +670,7 @@ wo_rust_tools() {
     i3_config
     create_dirs
     setup_bg
+    setup_subl
     install_apt
     install_fonts
     install_ohmytmux

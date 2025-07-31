@@ -18,17 +18,18 @@ After the latest modifications to the script it may not work perfectly because i
 - oscanner
 - xmlstarlet
 - redis-tools
-- jython - not tested
+- jython (not tested)
 - sipvicious
 - zaproxy
 - hurl
 - guake
 - pcmanfm
 - fish
-- hx (helix)
-- terminator
 - tmux
 - xsel
+- hx (helix)
+- subl (sublime-text)
+- terminator
 - some others...
 
 ***Other installs, configs, etc.***
