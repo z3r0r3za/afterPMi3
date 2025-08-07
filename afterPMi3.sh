@@ -319,6 +319,12 @@ install_starship() {
     chown kali:kali /home/kali/.config/starship.toml   
 }
 
+install_alacritty_theme() {
+    mkdir /home/kali/.config/alacritty
+    cp /home/kali/Downloads/afterPMi3/alacritty.toml /home/kali/.config/alacritty
+    chown kali:kali /home/kali/.config/alacritty.toml
+}
+
 install_bs_theme() {
     cp /home/kali/Downloads/afterPMi3/solarpower.json /usr/share/bumblebee-status/themes/solarized-powerlined.json
 }
@@ -674,6 +680,7 @@ w_rust_tools() {
     install_ohmytmux
     install_fish_config
     install_starship
+    install_alacritty_theme
     install_bs_theme
     install_nvm
     install_autorecon
@@ -699,6 +706,7 @@ wo_rust_tools() {
     install_ohmytmux
     install_fish_config
     install_starship
+    install_alacritty_theme
     install_bs_theme
     install_nvm
     install_autorecon
