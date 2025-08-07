@@ -6,7 +6,7 @@
 # 
 # Packages: zaproxy, guake, pcmanfm, helix, sublime-text, obsidian, fish, terminator, tmux, xsel, oscanner, 
 # redis-tools, sipvicious, tnscmd10g, bloodhound-ce, hurl, vivaldi, code, rustscan, feroxbuster, ripgrep, 
-# cmake, pkg-config.
+# cmake, alacritty, rssguard, pkg-config.
 #
 # Configurations: i3, bumblebee-status, tmux, fish (and enables it), feh, powerline and other fonts, backgrounds, 
 # Obsidian TEMPLATE.zip.
@@ -162,7 +162,8 @@ setup_bg() {
 
 setup_subl() {
     wget -qO - https://download.sublimetext.com/sublimehq-pub.gpg | tee /etc/apt/keyrings/sublimehq-pub.asc > /dev/null
-    echo -e 'Types: deb\nURIs: https://download.sublimetext.com/\nSuites: apt/stable/\nSigned-By: /etc/apt/keyrings/sublimehq-pub.asc' | tee /etc/apt/sources.list.d/sublime-text.sources
+    echo -e 'Types: deb\nURIs: https://download.sublimetext.com/\nSuites: apt/stable/\nSigned-By: /etc/apt/keyrings/sublimehq-pub.asc' | \
+        tee /etc/apt/sources.list.d/sublime-text.sources
 }
 
 # Check and install packages.
@@ -170,7 +171,29 @@ install_apt() {
     echo
     echo "[+] Checking and installing some missing packages."
     local packages=(
-        zaproxy guake pcmanfm hx sublime-text fish tmux xsel xmlstarlet terminator bumblebee-status gnome-system-monitor pamixer hurl galculator oscanner redis-tools sipvicious tnscmd10g cmake pkg-config
+        "zaproxy" \
+        "guake" \
+        "pcmanfm" \
+        "hx" \
+        "sublime-text" \
+        "fish" \
+        "tmux" \
+        "xsel" \
+        "xmlstarlet" \
+        "terminator" \
+        "alacritty" \
+        "rssguard" \
+        "bumblebee-status" \
+        "gnome-system-monitor" \
+        "pamixer" \
+        "hurl" \
+        "galculator" \
+        "oscanner" \
+        "redis-tools" \
+        "sipvicious" \
+        "tnscmd10g" \
+        "cmake" \
+        "pkg-config"
     )
     # Array to hold packages that are not installed
     local -a to_install=()

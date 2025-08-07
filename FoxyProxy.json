@@ -1,0 +1,33 @@
+{
+  "mode": "disable",
+  "sync": false,
+  "autoBackup": false,
+  "passthrough": "<-loopback>",
+  "theme": "",
+  "container": {},
+  "commands": {
+    "setProxy": "",
+    "setTabProxy": "",
+    "quickAdd": ""
+  },
+  "data": [
+    {
+      "active": true,
+      "title": "Burp",
+      "type": "http",
+      "hostname": "127.0.0.1",
+      "port": "8080",
+      "username": "",
+      "password": "",
+      "cc": "",
+      "city": "",
+      "color": "#00bfff",
+      "pac": "",
+      "pacString": "",
+      "proxyDNS": true,
+      "include": [],
+      "exclude": [],
+      "tabProxy": []
+    }
+  ]
+}
