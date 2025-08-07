@@ -6,7 +6,7 @@
 # 
 # Packages: zaproxy, guake, pcmanfm, helix, sublime-text, obsidian, fish, terminator, tmux, xsel, oscanner, 
 # redis-tools, sipvicious, tnscmd10g, bloodhound-ce, hurl, vivaldi, code, rustscan, feroxbuster, ripgrep, 
-# cmake, alacritty, rssguard, pkg-config.
+# cmake, alacritty, rssguard, pkg-config, conky-std.
 #
 # Configurations: i3, bumblebee-status, tmux, fish (and enables it), feh, powerline and other fonts, backgrounds, 
 # Obsidian TEMPLATE.zip.
@@ -193,7 +193,8 @@ install_apt() {
         "sipvicious" \
         "tnscmd10g" \
         "cmake" \
-        "pkg-config"
+        "pkg-config" \
+        "conky-std"
     )
     # Array to hold packages that are not installed
     local -a to_install=()
@@ -320,9 +321,16 @@ install_starship() {
 }
 
 install_alacritty_theme() {
+    cd /home/kali/Downloads/afterPMi3/
     mkdir /home/kali/.config/alacritty
-    cp /home/kali/Downloads/afterPMi3/alacritty.toml /home/kali/.config/alacritty
-    chown kali:kali /home/kali/.config/alacritty.toml
+    mkdir /home/kali/.config/alacritty/themes
+    unzip -q alacritty.zip || true
+    cp /home/kali/Downloads/afterPMi3/alacritty/alacritty.toml /home/kali/.config/alacritty
+    cp /home/kali/Downloads/afterPMi3/alacritty/dracula.toml /home/kali/.config/alacritty/themes
+    cp /home/kali/Downloads/afterPMi3/alacritty/terafox.toml /home/kali/.config/alacritty/themes
+    cp /home/kali/Downloads/afterPMi3/alacritty/zatonga.toml /home/kali/.config/alacritty/themes
+    chown kali:kali /home/kali/.config/alacritty
+    chown kali:kali /home/kali/.config/alacritty/*
 }
 
 install_bs_theme() {
