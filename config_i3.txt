@@ -253,11 +253,11 @@ set $ws7 "7"
 set $ws8 "8"
 set $ws9 "9"
 set $ws10 "10"
-set $ws10 "11"
-set $ws10 "12"
-set $ws10 "13"
-set $ws10 "14"
-set $ws10 "15"
+set $ws11 "11"
+set $ws12 "12"
+set $ws13 "13"
+set $ws14 "14"
+set $ws15 "15"
 
 # switch to workspace
 bindsym $modkey+1 workspace $ws1

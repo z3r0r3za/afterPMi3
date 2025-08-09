@@ -1,10 +1,10 @@
-This afterPMi3 script does a little more set up in Kali Linux after running [pimpmyi3](https://github.com/Dewalt-arch/pimpmyi3).
+afterPMi3.sh so I can pimp my pimpmyi3... or at least do a little more set up in Kali Linux after running [pimpmyi3](https://github.com/Dewalt-arch/pimpmyi3).
 
-pimpmyi3 also downloads and runs [pimpmykali](https://github.com/Dewalt-arch/pimpmykali). When pimpmyi3 has finished and the VM is rebooted, it will automatically log in as root. Run afterPMi3.sh as root after pimpmyi3 is finished and you've rebooted.
+pimpmyi3 also downloads and runs [pimpmykali](https://github.com/Dewalt-arch/pimpmykali). When pimpmyi3 has finished (after running it with option 1) and the VM is rebooted, it will automatically log in as root. afterPMi3.sh should be cloned and run as root after pimpmyi3 is finished and you've rebooted for the first time. Packages there were already installed will be skipped.
 
-When afterPMi3 is finished and the VM is logged in as the kali user, it will have a different i3 config, fish shell with the tide theme (optional starship), oh-my-tmux, nvm (for node), fonts, a different background for each desktop, and a lot more tools.
+When afterPMi3 is finished and the VM is logged in as the kali user, it will have a different i3 config, fish shell with the tide theme (optional starship), oh-my-tmux, nvm (for node), fonts, a different background for each desktop, and a lot more tools. Some of this isn't necessary for pentesting, but some of it can be... so there ya go.
 
-After the latest modifications to the script it may not work perfectly because it hasn't been fully tested yet (Date of this message: 08/07/25).
+After the latest modifications to afterPMi3.sh it might have issues. It hasn't been fully tested on a fresh install snapshot yet (08/09/25).
 
 ***Installed Packages***
 
@@ -33,7 +33,7 @@ After the latest modifications to the script it may not work perfectly because i
 - subl (sublime-text)
 - terminator
 - alacritty
-- conky
+- conky (conky-std)
 - some others...
 
 ***Other installs, configs, etc.***
