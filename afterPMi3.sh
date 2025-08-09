@@ -5,8 +5,8 @@
 # This script assumes that afterPMi3 has been cloned or downloaded into: /home/kali/Downloads/afterPMi3
 # 
 # Packages: zaproxy, guake, pcmanfm, helix, sublime-text, obsidian, fish, terminator, tmux, xsel, oscanner, 
-# redis-tools, sipvicious, tnscmd10g, bloodhound-ce, hurl, vivaldi, code, rustscan, feroxbuster, ripgrep, 
-# cmake, alacritty, rssguard, pkg-config, conky-std.
+# redis-tools, sipvicious, tnscmd10g, bloodhound-ce, autorecon, hurl, vivaldi, code, sublime, rustscan, 
+# feroxbuster, ripgrep, cmake, alacritty, rssguard, pkg-config, conky-std.
 #
 # Configurations: i3, bumblebee-status, tmux, fish (and enables it), feh, powerline and other fonts, backgrounds, 
 # Obsidian TEMPLATE.zip.
@@ -315,12 +315,13 @@ install_fish_config() {
 # Install and setup starfish for kali user.
 install_starship() {
     curl -sS https://starship.rs/install.sh | sh -s -- -y
-    echo "[+] Set up Starship config."
+    echo "[+] Install and set up Starship config."
     cp /home/kali/Downloads/afterPMi3/starship.toml /home/kali/.config
     chown kali:kali /home/kali/.config/starship.toml   
 }
 
 install_alacritty_theme() {
+    echo "[+] Set up alacritty themes."
     cd /home/kali/Downloads/afterPMi3/
     mkdir /home/kali/.config/alacritty
     mkdir /home/kali/.config/alacritty/themes
@@ -334,7 +335,16 @@ install_alacritty_theme() {
 }
 
 install_bs_theme() {
+    echo "[+] Set up bumblebee-status theme."
     cp /home/kali/Downloads/afterPMi3/solarpower.json /usr/share/bumblebee-status/themes/solarized-powerlined.json
+}
+
+install_conky() {
+    echo "[+] Set up conky."
+    unzip -q conky.zip || true
+    cp /home/kali/Downloads/afterPMi3/conky/start_conky /usr/bin
+    cp /home/kali/Downloads/afterPMi3/conky/conky_shortcuts_custom /usr/share/doc/conky-std
+    cp /home/kali/Downloads/afterPMi3/conky/ /usr/share/doc/conky-std
 }
 
 # Install nvm for kali user.
@@ -690,13 +700,14 @@ w_rust_tools() {
     install_starship
     install_alacritty_theme
     install_bs_theme
+    install_conky
     install_nvm
     install_autorecon
     install_vivaldi
     install_vscode
     install_obsidian
     install_bloodhound_ce
-    #install_jython
+    install_jython
     install_rust_tools "$CARGO_INSTALL"
     enable_fish
     remove_downloads
@@ -716,13 +727,14 @@ wo_rust_tools() {
     install_starship
     install_alacritty_theme
     install_bs_theme
+    install_conky
     install_nvm
     install_autorecon
     install_vivaldi
     install_vscode
     install_obsidian
     install_bloodhound_ce
-    #install_jython
+    install_jython
     enable_fish
     remove_downloads
     finished
@@ -748,14 +760,12 @@ finished() {
     echo "[+] Before reboot: To reboot press Alt-Shift-E, then press r."
     echo "[+] Before reboot: To log in press Alt-Shift-E, then press e."
     echo "[+] Then in the top right menu, select i3 and log in as kali."
-    echo "[+] Before reboot: To reboot press Alt-Meta-E, then press r."
-    echo "[+] Before reboot: To log in press Alt-Meta-E, then press e."
 }
 
 # Print when setup is finished.
 finishedrust() {
     echo
-    echo "[+] afterPMi3 is finished the Rust tools installation."
+    echo "[+] afterPMi3 has finished the Rust tools installation."
     echo "-------------------------------------------------------------------"
 }
 

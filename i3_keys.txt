@@ -2,28 +2,35 @@
 #################### Reload i3 config 
 modkey+Shift+c
 
-#################### i3 key commands 
+#################### Restart i3 config in place
+modkey+Shift+r
+
+#################### i3 key commands (this file)
 modkey+i
 
 #################### terminator 
 modkey+Return 
 
 #################### LAUNCH 
-modkey+F1  - firefox
-modkey+F2  - vivaldi
-modkey+F3  - terminator
-modkey+F4  - code
-modkey+F5  - pcmanfm
-modkey+F6  - zaproxy
-modkey+F7  - burpsuite
-modkey+F8  - bloodhound
-modkey+F9  - obsidian
-modkey+F10 - hx
+modkey+F1        - firefox
+modkey+F2        - vivaldi
+modkey+F3        - alacritty
+modkey+F4        - code
+altkey+F4        - sublime
+modkey+F5        - pcmanfm
+altkey+F5        - thunar
+modkey+Shift+F5  - gedit
+modkey+F6        - zaproxy
+modkey+F7        - burpsuite
+modkey+F8        - bloodhound
+modkey+F9        - obsidian
+modkey+F10       - hx
+modkey+y         - mousepad (floating)
 
-#################### MENU 
-modkey+d
-modkey+f
-modkey+g
+#################### MENUS
+modkey+d - rofi
+modkey+f - i3 dmenu
+modkey+g - dmenu
 
 #################### Use these keys for focus, movement, and resize
 # directions when reaching for the arrows is not convenient
@@ -37,8 +44,8 @@ modkey+1
 modkey+2
 [...]
 
-modkey+mod2+KP_1 
-modkey+mod2+KP_2 
+modkey+KP_1 
+modkey+KP_2 
 [...]
 
 #################### move focused container to workspace
@@ -46,8 +53,8 @@ modkey+Shift+1
 modkey+Shift+2 
 [...]
 
-modkey+mod2+Shift+KP_1 
-modkey+mod2+Shift+KP_2 
+modkey+Ctrl+KP_1 
+modkey+Ctrl+KP_2 
 [...]
 
 #################### Toggle bar

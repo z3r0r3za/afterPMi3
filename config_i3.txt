@@ -14,7 +14,7 @@ exec_always --no-startup-id i3fehbgk
 # uncomment the line below to use the 'windows key' as your modkey
 set $modkey Mod4
 # uncomment the line below to use the 'alt' key as your modkey
-set $supkey Mod1
+set $altkey Mod1
 
 # Set mod key (Mod1=<Alt>, Mod4=<Super>)
 #set $mod Mod4
@@ -53,38 +53,31 @@ set $right semicolon
 floating_modifier $modkey
 
 # i3 key commands
-bindsym $modkey+i exec --no-startup-id mousepad /home/kali/.config/i3/i3_keys.txt
+bindsym $modkey+i exec --no-startup-id mousepad /home/kali/.config/i3/i3_keys
 
 # modkey+ctrl+NUMBER quicklaunch applications
 # only the first 6 keys have been programmed with commonly used program
 # feel free to Change and customize and move them around for you!
 # uncomment to activate modkey+ctrl for that key
-#bindsym $modkey+ctrl+1 exec --no-startup-id firefox
-#bindsym $modkey+ctrl+2 exec --no-startup-id burpsuite
-#bindsym $modkey+ctrl+3 exec --no-startup-id zaproxy
-#bindsym $modkey+ctrl+4 exec --no-startup-id code
-#bindsym $modkey+ctrl+5 exec --no-startup-id pcmanfm
-#bindsym $modkey+ctrl+6 exec --no-startup-id thunar
-#bindsym $modkey+ctrl+7 exec --no-startup-id gedit
-#bindsym $modkey+ctrl+8 exec --no-startup-id terminator -e 'tmux new -s hack'
-#bindsym $modkey+ctrl+9 exec --no-startup-id terminator -e 'ip a | grep tun0'
-#bindsym $modkey+ctrl+0 exec --no-startup-id terminator -e 'msfconsole'
 bindsym $modkey+F1 exec --no-startup-id firefox
 bindsym $modkey+F2 exec --no-startup-id vivaldi
-bindsym $modkey+F3 exec --no-startup-id terminator
+bindsym $modkey+F3 exec --no-startup-id alacritty
 bindsym $modkey+F4 exec --no-startup-id code
+bindsym $altkey+F4 exec --no-startup-id subl
 bindsym $modkey+F5 exec --no-startup-id pcmanfm
+bindsym $altkey+F5 exec --no-startup-id thunar
+bindsym $modkey+Shift+F5 exec --no-startup-id gedit
 bindsym $modkey+F6 exec --no-startup-id zaproxy
 bindsym $modkey+F7 exec --no-startup-id burpsuite
 bindsym $modkey+F8 exec --no-startup-id bloodhound
 bindsym $modkey+F9 exec --no-startup-id obsidian
 bindsym $modkey+F10 exec --no-startup-id hx
+bindsym $modkey+y exec --no-startup-id mousepad
 #bindsym $modkey+F8 exec --no-startup-id terminator -e 'tmux new -s hack'
 #bindsym $modkey+F9 exec --no-startup-id terminator -e 'ip a | grep tun0'
 #bindsym $modkey+F10 exec --no-startup-id terminator -e 'msfconsole'
 
 # start a terminal
-# bindsym $modkey+Return exec --no-startup-id konsole
 # bindsym $modkey+Return exec --no-startup-id i3-sensible-terminal
 bindsym $modkey+Return exec --no-startup-id terminator
 
@@ -260,6 +253,11 @@ set $ws7 "7"
 set $ws8 "8"
 set $ws9 "9"
 set $ws10 "10"
+set $ws10 "11"
+set $ws10 "12"
+set $ws10 "13"
+set $ws10 "14"
+set $ws10 "15"
 
 # switch to workspace
 bindsym $modkey+1 workspace $ws1
@@ -272,6 +270,11 @@ bindsym $modkey+7 workspace $ws7
 bindsym $modkey+8 workspace $ws8
 bindsym $modkey+9 workspace $ws9
 bindsym $modkey+0 workspace $ws10
+bindsym $altkey+1 workspace $ws11
+bindsym $altkey+2 workspace $ws12
+bindsym $altkey+3 workspace $ws13
+bindsym $altkey+4 workspace $ws14
+bindsym $altkey+5 workspace $ws15
 
 bindsym $modkey+mod2+KP_1 workspace $ws1
 bindsym $modkey+mod2+KP_2 workspace $ws2
@@ -283,6 +286,11 @@ bindsym $modkey+mod2+KP_7 workspace $ws7
 bindsym $modkey+mod2+KP_8 workspace $ws8
 bindsym $modkey+mod2+KP_9 workspace $ws9
 bindsym $modkey+mod2+KP_0 workspace $ws10
+bindsym $altkey+mod2+KP_1 workspace $ws11
+bindsym $altkey+mod2+KP_2 workspace $ws12
+bindsym $altkey+mod2+KP_3 workspace $ws13
+bindsym $altkey+mod2+KP_4 workspace $ws14
+bindsym $altkey+mod2+KP_5 workspace $ws15
 
 # move focused container to workspace
 bindsym $modkey+Shift+1 move container to workspace $ws1
@@ -295,17 +303,27 @@ bindsym $modkey+Shift+7 move container to workspace $ws7
 bindsym $modkey+Shift+8 move container to workspace $ws8
 bindsym $modkey+Shift+9 move container to workspace $ws9
 bindsym $modkey+Shift+0 move container to workspace $ws10
+bindsym $altkey+Shift+1 move container to workspace $ws11
+bindsym $altkey+Shift+2 move container to workspace $ws12
+bindsym $altkey+Shift+3 move container to workspace $ws13
+bindsym $altkey+Shift+4 move container to workspace $ws14
+bindsym $altkey+Shift+5 move container to workspace $ws15
 
-bindsym $modkey+mod2+Shift+KP_1 move container to workspace $ws1
-bindsym $modkey+mod2+Shift+KP_2 move container to workspace $ws2
-bindsym $modkey+mod2+Shift+KP_3 move container to workspace $ws3
-bindsym $modkey+mod2+Shift+KP_4 move container to workspace $ws4
-bindsym $modkey+mod2+Shift+KP_5 move container to workspace $ws5
-bindsym $modkey+mod2+Shift+KP_6 move container to workspace $ws6
-bindsym $modkey+mod2+Shift+KP_7 move container to workspace $ws7
-bindsym $modkey+mod2+Shift+KP_8 move container to workspace $ws8
-bindsym $modkey+mod2+Shift+KP_9 move container to workspace $ws9
-bindsym $modkey+mod2+Shift+KP_0 move container to workspace $ws10
+bindsym $modkey+mod2+ctrl+KP_1 move container to workspace $ws1
+bindsym $modkey+mod2+ctrl+KP_2 move container to workspace $ws2
+bindsym $modkey+mod2+ctrl+KP_3 move container to workspace $ws3
+bindsym $modkey+mod2+ctrl+KP_4 move container to workspace $ws4
+bindsym $modkey+mod2+ctrl+KP_5 move container to workspace $ws5
+bindsym $modkey+mod2+ctrl+KP_6 move container to workspace $ws6
+bindsym $modkey+mod2+ctrl+KP_7 move container to workspace $ws7
+bindsym $modkey+mod2+ctrl+KP_8 move container to workspace $ws8
+bindsym $modkey+mod2+ctrl+KP_9 move container to workspace $ws9
+bindsym $modkey+mod2+ctrl+KP_0 move container to workspace $ws10
+bindsym $altkey+mod2+ctrl+KP_1 move container to workspace $ws11
+bindsym $altkey+mod2+ctrl+KP_2 move container to workspace $ws12
+bindsym $altkey+mod2+ctrl+KP_3 move container to workspace $ws13
+bindsym $altkey+mod2+ctrl+KP_4 move container to workspace $ws14
+bindsym $altkey+mod2+ctrl+KP_5 move container to workspace $ws15
 
 # Open specific applications in floating mode
 for_window [class="Guake"] floating enable border normal
@@ -358,28 +376,22 @@ mode "resize" {
 
 bindsym $modkey+r mode "resize"
 
-######################### i3status - bumblebee-status #########################
 # Start i3bar to display a workspace bar (plus the system information i3status
-# finds out, if available). Uncomment the lines for bumblebee-status and Hack 
-# font (or pick your own powerline font) if you want to use that instead of 
-# i3status. Then comment out "status_command i3status", "separator_symbol" 
-# and the "Terminus" font. Restart i3: Ctrl+Shift+R
-# Powerline fonts: https://github.com/powerline/fonts
-# Modules and themes: https://github.com/tobi-wan-kenobi/bumblebee-status
+# finds out, if available)
 bar {
     mode dock
     position top
     strip_workspace_numbers yes
-    ###-- Uncomment for i3status next 3 lines below --###
-    status_command i3status
-    font pango: Terminus (TTF) medium 12
-    separator_symbol "]["
-    ###-- Uncomment for bumblebee-status next 5 lines below --###
-    #font pango: FontAwesome, Hack 11
-    #status_command /usr/bin/bumblebee-status -m nic cpu \
-    #    -m memory date time pamixer \
-    #    -p time.format="%H:%M" date.format="%a, %b %d %Y" nic.exclude="lo,br,docker,veth,nordlynx" pamixer.percent_change=1% \
-    #    -t solarized-powerline
+    # i3status next 3 lines below.
+    #status_command i3status
+    #font pango: Terminus (TTF) medium 12
+    #separator_symbol "]["
+    # Bumblebee-status next 3 lines below.
+    font pango: FontAwesome, Hack 11
+    status_command /usr/bin/bumblebee-status -m nic cpu \
+        -m memory date time pamixer \
+        -p time.format="%H:%M" date.format="%a, %b %d %Y" nic.exclude="lo,br,docker,veth,nordlynx" pamixer.percent_change=1% \
+        -t solarized-powerline
 
     colors {
         #Where      #Color
@@ -487,4 +499,5 @@ exec --no-startup-id flameshot
 exec --no-startup-id nm-applet
 exec --no-startup-id numlockx on
 exec --no-startup-id i3-config-wizard
+exec_always --no-startup-id start_conky
 exec --no-startup-id guake

@@ -15,6 +15,7 @@ After the latest modifications to the script it may not work perfectly because i
 - feroxbuster
 - rg (ripgrep)
 - bloodhound-cli
+- autorecon
 - oscanner
 - xmlstarlet
 - redis-tools
@@ -32,6 +33,7 @@ After the latest modifications to the script it may not work perfectly because i
 - subl (sublime-text)
 - terminator
 - alacritty
+- conky
 - some others...
 
 ***Other installs, configs, etc.***
