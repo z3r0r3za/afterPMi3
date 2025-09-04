@@ -85,19 +85,6 @@ Setup starts when key is pressed. Choose your Rust tool install mode:
 
 EOF
 
-while true; do
-    read -n1 -p "Enter option [1/2/3/4/5/q] or press q to exit: " rust_choice
-    case "$rust_choice" in
-        1) w_rust_tools; CARGO_INSTALL="--all"; break ;;
-        2|"") w_rust_tools; CARGO_INSTALL=""; break ;;
-        3) wo_rust_tools; CARGO_INSTALL="--none"; break ;;        
-        4) o_rust_tools; CARGO_INSTALL="--all"; ONLY_RUST="--all"; break ;;
-        5) o_rust_tools; CARGO_INSTALL=""; ONLY_RUST=""; break ;;
-        [Qq]) echo "Exiting..."; exit 0 ;;
-        *) echo "Invalid input. Please enter 1, 2, 3, 4, or q to exit." ;;
-    esac
-done
-
 # Set up i3 config directory and permissions.
 i3_config() {
     echo "[+] Setting up i3 config for kali user."
@@ -769,3 +756,15 @@ finishedrust() {
     echo "-------------------------------------------------------------------"
 }
 
+while true; do
+    read -n1 -p "Enter option [1/2/3/4/5/q] or press q to exit: " rust_choice
+    case "$rust_choice" in
+        1) w_rust_tools; CARGO_INSTALL="--all"; break ;;
+        2|"") w_rust_tools; CARGO_INSTALL=""; break ;;
+        3) wo_rust_tools; CARGO_INSTALL="--none"; break ;;        
+        4) o_rust_tools; CARGO_INSTALL="--all"; ONLY_RUST="--all"; break ;;
+        5) o_rust_tools; CARGO_INSTALL=""; ONLY_RUST=""; break ;;
+        [Qq]) echo "Exiting..."; exit 0 ;;
+        *) echo "Invalid input. Please enter 1, 2, 3, 4, or q to exit." ;;
+    esac
+done

@@ -4,7 +4,7 @@ pimpmyi3 also downloads and runs [pimpmykali](https://github.com/Dewalt-arch/pim
 
 When afterPMi3 is finished and the VM is logged in as the kali user, it will have a different i3 config, fish shell with the tide theme (optional starship), oh-my-tmux, nvm (for node), fonts, a different background for each desktop, and a lot more tools. Some of this isn't necessary for pentesting, but some of it can be... so there ya go.
 
-After the latest modifications to afterPMi3.sh it might have issues. It hasn't been fully tested on a fresh install snapshot yet (08/09/25).
+After the latest modifications to afterPMi3.sh it probably has issues. It hasn't been tested on a fresh pimpmyi3 install yet (09/04/25).
 
 ***Installed Packages***
 
