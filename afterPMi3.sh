@@ -15,6 +15,8 @@
 # cat /home/kali/Downloads/afterPMi3/afterPMi3.log to view logs.
 exec > >(tee /home/kali/Downloads/afterPMi3/afterPMi3.log) 2>&1
 
+KUSER="/home/kali"
+
 # Ensure the script is run as root
 if [[ "$EUID" -ne 0 ]]; then
     echo "[!] This script was meant to be run as root. Please switch to root and run it again."
@@ -331,7 +333,7 @@ install_conky() {
     unzip -q conky.zip || true
     cp /home/kali/Downloads/afterPMi3/conky/start_conky /usr/bin
     cp /home/kali/Downloads/afterPMi3/conky/conky_shortcuts_custom /usr/share/doc/conky-std
-    cp /home/kali/Downloads/afterPMi3/conky/ /usr/share/doc/conky-std
+    cp /home/kali/Downloads/afterPMi3/conky/conky_custom /usr/share/doc/conky-std
 }
 
 # Install nvm for kali user.
@@ -345,7 +347,7 @@ install_nvm() {
 }
 
 install_autorecon() {
-    sudo -u kali bash -c pipx install git+https://github.com/Tib3rius/AutoRecon.git
+    sudo -u kali bash -c "pipx install git+https://github.com/Tib3rius/AutoRecon.git"
 }
 
 # Install Vivaldi browser if it isn't.
@@ -402,7 +404,7 @@ install_obsidian() {
     if [ ! -d "/home/kali/notes/TEMPLATE" ]; then
         mv TEMPLATE /home/kali/notes
         chown -R kali:kali /home/kali/notes/*
-        chown -R kali:kali /home/kali/notes/.[^.]*
+        chown -R kali:kali /home/kali/notes/TEMPLATE/.obsidian
     fi
 
     echo
@@ -437,9 +439,10 @@ install_bloodhound_ce() {
         echo "[+] Looks like bloodhound-cli already exists inside the opt directory."
     else
         cd /opt
-        sudo -u kali bash -c "wget https://github.com/SpecterOps/bloodhound-cli/releases/latest/download/bloodhound-cli-linux-amd64.tar.gz"
-        sudo -u kali bash -c "tar -xvzf bloodhound-cli-linux-amd64.tar.gz"
-        sudo -u kali bash -c "./bloodhound-cli install"
+        wget https://github.com/SpecterOps/bloodhound-cli/releases/latest/download/bloodhound-cli-linux-amd64.tar.gz
+        tar -xvzf bloodhound-cli-linux-amd64.tar.gz
+        cd bloodhound-cli-linux-amd64
+        ./bloodhound-cli install
     fi
 }
 
