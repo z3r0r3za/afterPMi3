@@ -697,7 +697,7 @@ w_rust_tools() {
     install_vscode
     install_obsidian
     install_bloodhound_ce
-    install_jython
+    #install_jython
     install_rust_tools "$CARGO_INSTALL"
     enable_fish
     remove_downloads
@@ -724,7 +724,7 @@ wo_rust_tools() {
     install_vscode
     install_obsidian
     install_bloodhound_ce
-    install_jython
+    #install_jython
     enable_fish
     remove_downloads
     finished
