@@ -461,7 +461,8 @@ install_jython() {
     fi
 
     # https://repo1.maven.org/maven2/org/python/jython-installer/2.7.4/jython-installer-2.7.4.jar
-    INSTALLER_URL="https://repo1.maven.org/maven2/org/python/jython-installer/$LATEST_VERSION/jython-installer-$LATEST_VERSION.jar"
+    #INSTALLER_URL="https://repo1.maven.org/maven2/org/python/jython-installer/$LATEST_VERSION/jython-installer-$LATEST_VERSION.jar"
+    INSTALLER_URL="https://repo1.maven.org/maven2/org/python/jython-standalone/$LATEST_VERSION/jython-standalone-$LATEST_VERSION.jar"
 
     INSTALL_DIR="jython$LATEST_VERSION"
 
@@ -469,38 +470,17 @@ install_jython() {
     mkdir -p "/home/kali/$INSTALL_DIR"
 
     # Download the Jython installer JAR.
-    echo "[+] Downloading Jython $INSTALL_DIR installer"
-    curl -o jython-installer.jar "$INSTALLER_URL"
+    echo "[+] Downloading $INSTALL_DIR standalone"
+    wget -q "$INSTALLER_URL" --directory "/home/kali/$INSTALL_DIR" || true
 
     # Check if download was successful from previous command.
     if [ $? -ne 0 ]; then
-        echo "[-] Failed to download Jython installer. Please check the URL and try again later."
-        exit 1
-    fi
-
-    # Run the installer with automation.
-    echo "[+] Installing Jython version $VERSION..."
-    java -jar jython-installer.jar \
-        --no-gui \                  # Run in non-GUI mode.
-        --install "$INSTALL_DIR" \  # Install to specified directory.
-        --target "$INSTALL_DIR" \   # Target directory (same as install).
-        --force \                   # Overwrite if needed.
-        --no-verify \               # Skip checksum verification (optional).
-        --no-checksum \             # Skip checksum verification (optional).
-        --no-include \              # Skip including documentation (optional).
-        --no-javadoc \              # Skip including Javadoc (optional).
-        --no-source \               # Skip including source code (optional).
-
-    # Check if installation was successful from previous command.
-    if [ $? -ne 0 ]; then
-        echo "[-] Jyton installation failed. You will have to install it manually."
-        exit 1
+        echo "[-] Failed to download Jython standalone. Check the URL and try again later."
     fi
 
     # Give owner as kali.
     chown kali:kali "/home/kali/$INSTALL_DIR"
-    chown -R kali:kali "/home/kali/$INSTALL_DIR/*"
-    chown -R kali:kali "/home/kali/$INSTALL_DIR/.[^.]*"   
+    chown -R kali:kali "/home/kali/$INSTALL_DIR/*"   
 }
 
 # Paths for go and cargo copied to zshrc/bashrc.
@@ -697,7 +677,7 @@ w_rust_tools() {
     install_vscode
     install_obsidian
     install_bloodhound_ce
-    #install_jython
+    install_jython
     install_rust_tools "$CARGO_INSTALL"
     enable_fish
     remove_downloads
@@ -724,7 +704,7 @@ wo_rust_tools() {
     install_vscode
     install_obsidian
     install_bloodhound_ce
-    #install_jython
+    install_jython
     enable_fish
     remove_downloads
     finished
