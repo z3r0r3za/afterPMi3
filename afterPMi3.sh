@@ -13,13 +13,14 @@
 # /usr/bin/vmhgfs-fuse .host:/kali /home/shared -o subtype=vmhgfs-fuse
 
 # cat /home/kali/Downloads/afterPMi3/afterPMi3.log to view logs.
-exec > >(tee /home/kali/Downloads/afterPMi3/afterPMi3.log) 2>&1
+exec > >(tee /home/kali/Downloads/afterPMi3.log) 2>&1
 
 KUSER="/home/kali"
 
 # Ensure the script is run as root
 if [[ "$EUID" -ne 0 ]]; then
-    echo "[!] This script was meant to be run as root. Please switch to root and run it again."
+    echo "[!] This script was meant to be run as root right after running pimpmyi3"
+    echo "and rebooting. You have to do pimpmyi3, log in as root and run it again."
     exit 1
 fi
 
@@ -42,7 +43,7 @@ if or how they are installed:
   q)           Exit afterPMi3 without installing anything.
   
 Note: This script was written to be run as root right after first reboot after running pimpmyi3, 
-but using sudo or sudo su from a non-root user with full privileges may work. It just hasn't 
+but using sudo or sudo su from a non-root user with full privileges might work, but it hasn't 
 been tested. If it's run as non root with just sudo, a password may be required.
 
 EOF
@@ -71,16 +72,15 @@ cat <<EOF
 ##                       afterPMi3 - Kali Setup                        ##
 #########################################################################
 
-This script continues a custom setup for kali user after running pimpmyi3.
+This script does a custom setup for the kali user after running pimpmyi3.
 https://github.com/Dewalt-arch/pimpmyi3
 It installs tools, editors, fonts, i3 and other configs, shells, etc.
 To see a little more press q to exit and then try ./afterPMi3.sh --help
-
 Setup starts when key is pressed. Choose your Rust tool install mode:
 
-  [1] Include all the Rust tools without prompting
-  [2] Prompt user to install each Rust tool
-  [3] Skip all the Rust tool installs
+  [1] Include everything and all the Rust tools without prompting
+  [2] Include everything while prompting to install each Rust tool
+  [3] Include everything, but skip all the Rust tools
   [4] Only Rust: install all the tools
   [5] Only Rust: prompt for each tool  
   [q] Quit
@@ -720,9 +720,14 @@ o_rust_tools() {
 finished() {
     echo
     echo "[+] afterPMi3 is finished."
+    echo "There should be a log file here: /home/kali/Downloads/afterPMi3.log"
+    echo "You can check the log file for any errors that might have happened for"
+    echo "whatever reason. Sometimes a particular install will fail."
     echo "------------------------------------------------------------------------"
-    echo "Bloodhound-CE default password will look something like this:"
+    echo "You can find the Bloodhound-CE password in the afterPMi3.log"
+    echo "The Bloodhound-CE default password line will look something like this:"
     echo "...log in as admin with this password: mSohlqWnVCflV60PzWQKdqYHxYGM3zUs"
+    echo "There may be other ways to get the password if you don't have it."
     echo "[+] Get admin password: bloodhound-cli config get default_password"
     echo "[+] Access the BloodHound at: http://127.0.0.1:8080/ui/login"
     echo "------------------------------------------------------------------------"
@@ -736,6 +741,8 @@ finished() {
 finishedrust() {
     echo
     echo "[+] afterPMi3 has finished the Rust tools installation."
+    echo "If any errors happened, you can find them in the log file:"
+    echo "/home/kali/Downloads/afterPMi3.log"
     echo "-------------------------------------------------------------------"
 }
 
