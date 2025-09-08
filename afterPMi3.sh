@@ -31,9 +31,9 @@ if [[ "$1" == "--help" ]]; then
 Usage: ./afterPMi3.sh
 
 This script configures Kali Linux for the kali user after running pimpmyi3.sh.
-It installs additional tools, terminals, editors, fonts, i3 configs, and user 
-shells. The Rust-based tools can take a little time to install so you can choose 
-if or how they are installed:
+It installs additional tools, terminals, editors, fonts, i3 and other configs, 
+and shells. The Rust-based tools can take a little time to install so you can 
+choose if or how they are installed:
 
   1) --all     Install rustscan, feroxbuster, ripgrep without prompting for each.
   2) (no flag) Interactive mode: Ask before each Rust tool installation.
@@ -42,9 +42,10 @@ if or how they are installed:
   5) (no flag) Only Rust: Ask before each Rust tool install.
   q)           Exit afterPMi3 without installing anything.
   
-Note: This script was written to be run as root right after first reboot after running pimpmyi3, 
-but using sudo or sudo su from a non-root user with full privileges might work, but it hasn't 
-been tested. If it's run as non root with just sudo, a password may be required.
+Note: This script was written to be run as root right after running pimpmyi3 and 
+rebooting, but using sudo or sudo su from a non-root user with full privileges 
+might work. Sudo hasn't been tested. If it's run as non root with just sudo, a 
+password will probably be required.
 
 EOF
     exit 0
@@ -74,9 +75,8 @@ cat <<EOF
 
 This script does a custom setup for the kali user after running pimpmyi3.
 https://github.com/Dewalt-arch/pimpmyi3
-It installs tools, editors, fonts, i3 and other configs, shells, etc.
-To see a little more press q to exit and then try ./afterPMi3.sh --help
-Setup starts when key is pressed. Choose your Rust tool install mode:
+To see  more info press q to exit and see: ./afterPMi3.sh --help
+Setup starts when key is pressed. Choose your install mode:
 
   [1] Include everything and all the Rust tools without prompting
   [2] Include everything while prompting to install each Rust tool
