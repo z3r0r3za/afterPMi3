@@ -32,15 +32,10 @@ Usage: ./afterPMi3.sh
 
 This script configures Kali Linux for the kali user after running pimpmyi3.sh.
 It installs additional tools, terminals, editors, fonts, i3 and other configs, 
-and shells. The Rust-based tools can take a little time to install so you can 
-choose if or how they are installed:
+and shells.
 
-  1) --all     Install rustscan, feroxbuster, ripgrep without prompting for each.
-  2) (no flag) Interactive mode: Ask before each Rust tool installation.
-  3) --none    Install everything, but skip installation of Rust tools.
-  4) --all     Only Rust: Install Rust tools without prompting each time.
-  5) (no flag) Only Rust: Ask before each Rust tool install.
-  q)           Exit afterPMi3 without installing anything.
+  1) Install all tools, configs and everything.
+  q) Exit afterPMi3 without installing anything.
   
 Note: This script was written to be run as root right after running pimpmyi3 and 
 rebooting, but using sudo or sudo su from a non-root user with full privileges 
@@ -78,11 +73,7 @@ https://github.com/Dewalt-arch/pimpmyi3
 To see  more info press q to exit and see: ./afterPMi3.sh --help
 Setup starts when key is pressed. Choose your install mode:
 
-  [1] Include everything and all the Rust tools without prompting
-  [2] Include everything while prompting to install each Rust tool
-  [3] Include everything, but skip all the Rust tools
-  [4] Only Rust: install all the tools
-  [5] Only Rust: prompt for each tool  
+  [1] Install and setup everything
   [q] Quit
 
 EOF
@@ -174,9 +165,12 @@ install_apt() {
         "rssguard" \
         "bumblebee-status" \
         "gnome-system-monitor" \
+        "fonts-font-awesome" \
         "pamixer" \
         "hurl" \
         "galculator" \
+        "ripgrep" \
+        "feroxbuster" \
         "oscanner" \
         "redis-tools" \
         "sipvicious" \
@@ -347,6 +341,8 @@ install_nvm() {
 }
 
 install_autorecon() {
+    echo "[+] Install AutoRecon"
+    echo "https://github.com/Tib3rius/AutoRecon.git"
     sudo -u kali bash -c "pipx install git+https://github.com/Tib3rius/AutoRecon.git"
 }
 
@@ -428,12 +424,13 @@ install_obsidian() {
             echo "[-] Failed to download Obsidian. Please check or try again later."
             exit 1
         fi
-    fi    
+    fi
 }
 
 # Install Bloodhound CE that uses docker.
 # https://bloodhound.specterops.io/get-started/quickstart/community-edition-quickstart
 install_bloodhound_ce() {
+    echo "[+] Install Bloodhound-CE" 
     local BLOODHOUND_CLI="/opt/bloodhound-cli"
     if [[ -f "$BLOODHOUND_CLI" ]]; then
         echo "[+] Looks like bloodhound-cli already exists inside the opt directory."
@@ -447,6 +444,7 @@ install_bloodhound_ce() {
 }
 
 install_jython() {
+    echo "[+] Install jython for using with Burp."
     # https://www.jython.org/installation.html
     # maven-metadata URL for extracting the latest version number.
     METADATA_URL="https://repo1.maven.org/maven2/org/python/jython-installer/maven-metadata.xml"
@@ -478,7 +476,7 @@ install_jython() {
         echo "[-] Failed to download Jython standalone. Check the URL and try again later."
     fi
 
-    # Give owner as kali.
+    # Set owner as kali.
     chown kali:kali "/home/kali/$INSTALL_DIR"
     chown -R kali:kali "/home/kali/$INSTALL_DIR/*"   
 }
@@ -500,46 +498,17 @@ source "/home/kali/.cargo/env"
 END_TEXT
 )
 
-install_rust_tools() {    
+install_rustscan() {    
     echo
+    echo "[+] Install rustscan"
     local ALL="$1"
     KALI_USER="kali"
     KALI_HOME="/home/${KALI_USER}"
     KALI_CARGO_BIN="${KALI_HOME}/.cargo/bin"
     INSTALL_ALL=false
 
-    # Optional --all flag.
-    if [[ "$ALL" == "--all" ]]; then
-        INSTALL_ALL=true
-        echo "[*] --all entered: Installing all 3 rust tools."
-    elif [[ "$ALL" == "--none" ]]; then
-        echo "[*] --none entered: Skipping all 3 rust tools."
-        return 0
-    fi
-
-    # Prompt user to install each one if no --all option.
-    ask_install() {
-        local tool="$1"
-
-        # Return and continue installation without asking.
-        if [ "$INSTALL_ALL" = true ]; then
-            return 0
-        fi
-
-        while true; do
-            # Default to Y if Enter pressed.
-            read -p "Continue installing $tool? [Y/n]: " yn
-            yn=${yn:-Y}
-            case $yn in
-                [Yy]* ) return 0 ;;
-                [Nn]* ) return 1 ;;
-                * ) echo "y (yes) or n (no)." ;;
-            esac
-        done
-    }
-
     # Function to install cargo globally using apt
-    install_cargo_via_apt() {
+    install_cargo_apt() {
         echo "[*] Running apt update and installing cargo."
         apt update && apt install -y cargo
     }
@@ -548,7 +517,7 @@ install_rust_tools() {
         echo "[✓] Cargo is installed: $(which cargo)"
     else
         echo "[!] 'cargo' not found in /usr/bin PATH."
-        if install_cargo_via_apt; then
+        if install_cargo_apt; then
             echo "[+] Installed cargo with apt install."
         else
             echo "[-] Cargo isn't and wasn't installed for some reason."
@@ -559,40 +528,14 @@ install_rust_tools() {
 
     # Make sure ~/.cargo/bin exists for kali user.
     sudo -u $KALI_USER mkdir -p "$KALI_CARGO_BIN"
+    # Install rustscan for kali user
+    sudo -u $KALI_USER bash -c "cargo install rustscan --root $KALI_HOME/.cargo"
 
-    # Install rustscan, feroxbuster, and ripgrep only if missing.
-    install_tool() {
-        local rust_tool="$1"
-        local install_cmd="$2"
-
-        echo "[*] Checking if $rust_tool is already installed for $KALI_USER..."
-
-        if sudo -u $KALI_USER "$KALI_CARGO_BIN/$rust_tool" --version >/dev/null 2>&1; then
-            echo "[✓] $rust_tool is already installed. Skipping."
-        else
-            echo "[+] Installing $rust_tool for $KALI_USER..."
-            sudo -u $KALI_USER bash -c "$install_cmd"
-        fi
-    }
-
-    # Prompt to install or auto-install if --all option present.
-    if ask_install "RustScan"; then
-        install_tool "rustscan" "cargo install rustscan --root $KALI_HOME/.cargo"
+    echo "[*] Verify installed version:"
+    if [ -x "$KALI_CARGO_BIN/rustscan" ]; then
+        echo -n " - rustscan: "
+        sudo -u $KALI_USER "$KALI_CARGO_BIN/rustscan" -V
     fi
-    if ask_install "Feroxbuster"; then
-        install_tool "feroxbuster" "cargo install feroxbuster --root $KALI_HOME/.cargo"
-    fi
-    if ask_install "Ripgrep (rg)"; then
-        install_tool "rg" "cargo install ripgrep --root $KALI_HOME/.cargo"
-    fi
-
-    echo "[*] Verify installed versions:"
-    for tool in rustscan feroxbuster rg; do
-        if [ -x "$KALI_CARGO_BIN/$tool" ]; then
-            echo -n " - $tool: "
-            sudo -u $KALI_USER "$KALI_CARGO_BIN/$tool" -V
-        fi
-    done
 
     echo "[+] Copying Go and Cargo paths to bashrc/zsh."
     echo "$ZSHBASH" >> /home/kali/.bashrc
@@ -617,6 +560,8 @@ remove_downloads() {
         "$DOWNLOADS/vivaldi-stable_amd64.deb" 
         "$DOWNLOADS/afterPMi3/Pictures"
         "$DOWNLOADS/fonts"
+        "$DOWNLOADS/extra_fonts"
+        "$DOWNLOADS/obsidian_amd64.deb"
     )
     
     for file in "${FILES[@]}"; do
@@ -635,30 +580,7 @@ remove_downloads() {
     find /home/kali/Downloads -type f -exec chown kali:kali {} \;
 }
 
-rust_message() {
-    local CI="$1"
-    local OR="$2"
-    if [ "$CI" == "--all" ]; then
-        echo "[+] Installing everything...."
-        echo "--------------------------------------------------------------------"
-        echo
-    elif [ "$CI" == "--none" ]; then
-        echo "[+] Installing everything except the Rust tools."
-        echo "--------------------------------------------------------------------"
-        echo
-    elif [[ "$CI" == "--all" && "$OR" == "--all" ]]; then
-        echo "[+] Installing only the Rust tools."
-        echo "--------------------------------------------------------------------"
-        echo
-    elif [[ "$CI" == "--none" && "$OR" == "" ]]; then
-        echo "[+] Installing only the Rust tools, prompting for each one."
-        echo "--------------------------------------------------------------------"
-        echo
-    fi    
-}
-
-w_rust_tools() {
-    rust_message "$CARGO_INSTALL"
+install_everything() {
     i3_config
     create_dirs
     setup_bg
@@ -678,42 +600,10 @@ w_rust_tools() {
     install_obsidian
     install_bloodhound_ce
     install_jython
-    install_rust_tools "$CARGO_INSTALL"
+    install_rustscan
     enable_fish
     remove_downloads
     finished
-}
-
-wo_rust_tools() {
-    rust_message "$CARGO_INSTALL"
-    i3_config
-    create_dirs
-    setup_bg
-    setup_subl
-    install_apt
-    install_fonts
-    install_ohmytmux
-    install_fish_config
-    install_starship
-    install_alacritty_theme
-    install_bs_theme
-    install_conky
-    install_nvm
-    install_autorecon
-    install_vivaldi
-    install_vscode
-    install_obsidian
-    install_bloodhound_ce
-    install_jython
-    enable_fish
-    remove_downloads
-    finished
-}
-
-o_rust_tools() {
-    rust_message "$CARGO_INSTALL" "$ONLY_RUST"
-    install_rust_tools "$CARGO_INSTALL"
-    finishedrust
 }
 
 # Print when setup is finished.
@@ -722,7 +612,7 @@ finished() {
     echo "[+] afterPMi3 is finished."
     echo "There should be a log file here: /home/kali/Downloads/afterPMi3.log"
     echo "You can check the log file for any errors that might have happened for"
-    echo "whatever reason. Sometimes a particular install will fail."
+    echo "whatever reason. The script is still in a testing phase."
     echo "------------------------------------------------------------------------"
     echo "You can find the Bloodhound-CE password in the afterPMi3.log"
     echo "The Bloodhound-CE default password line will look something like this:"
@@ -737,23 +627,10 @@ finished() {
     echo "[+] Then in the top right menu, select i3 and log in as kali."
 }
 
-# Print when setup is finished.
-finishedrust() {
-    echo
-    echo "[+] afterPMi3 has finished the Rust tools installation."
-    echo "If any errors happened, you can find them in the log file:"
-    echo "/home/kali/Downloads/afterPMi3.log"
-    echo "-------------------------------------------------------------------"
-}
-
 while true; do
-    read -n1 -p "Enter option [1/2/3/4/5/q] or press q to exit: " rust_choice
-    case "$rust_choice" in
-        1) w_rust_tools; CARGO_INSTALL="--all"; break ;;
-        2|"") w_rust_tools; CARGO_INSTALL=""; break ;;
-        3) wo_rust_tools; CARGO_INSTALL="--none"; break ;;        
-        4) o_rust_tools; CARGO_INSTALL="--all"; ONLY_RUST="--all"; break ;;
-        5) o_rust_tools; CARGO_INSTALL=""; ONLY_RUST=""; break ;;
+    read -n1 -p "Enter option [1/q] or press q to exit: " install_choice
+    case "$install_choice" in
+        1) install_everything; break ;;
         [Qq]) echo "Exiting..."; exit 0 ;;
         *) echo "Invalid input. Please enter 1, 2, 3, 4, or q to exit." ;;
     esac
