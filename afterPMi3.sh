@@ -32,7 +32,8 @@ Usage: ./afterPMi3.sh
 
 This script configures Kali Linux for the kali user after running pimpmyi3.sh.
 It installs additional tools, terminals, editors, fonts, i3 and other configs, 
-and shells.
+and shells. The kali user's password is kali. You will be asked to change the
+password when it starts.
 
   1) Install all tools, configs and everything.
   q) Exit afterPMi3 without installing anything.
@@ -70,13 +71,39 @@ cat <<EOF
 
 This script does a custom setup for the kali user after running pimpmyi3.
 https://github.com/Dewalt-arch/pimpmyi3
-To see  more info press q to exit and see: ./afterPMi3.sh --help
+To see more info press q to exit and see: ./afterPMi3.sh --help
 Setup starts when key is pressed. Choose your install mode:
 
   [1] Install and setup everything
   [q] Quit
 
 EOF
+
+# Change the password for the kali user.
+kali_password() {
+    NEW_PASSWORD=""
+    CONFIRM_PASSWORD=""
+    while true; do
+        echo "Enter new password for kali user:"
+        read -s NEW_PASSWORD
+        echo
+
+        echo "Confirm new password for kali user:"
+        read -s CONFIRM_PASSWORD
+        echo
+
+        if [[ "$NEW_PASSWORD" == "$CONFIRM_PASSWORD" ]]; then
+            # Set the password using passwd with --stdin
+            echo "kali:$NEW_PASSWORD" | chpasswd --crypt-method=SHA512
+            echo "Password successfully set."
+            break
+        else
+            echo "Passwords do not match. Please try again."
+            NEW_PASSWORD=""
+            CONFIRM_PASSWORD=""
+        fi
+    done
+}
 
 # Set up i3 config directory and permissions.
 i3_config() {
@@ -581,6 +608,7 @@ remove_downloads() {
 }
 
 install_everything() {
+    kali_password
     i3_config
     create_dirs
     setup_bg
